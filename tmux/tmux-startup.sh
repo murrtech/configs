@@ -9,7 +9,7 @@ COMPASS_SERVICES="$HOME/Documents/compass-services/"
 tmux new-session -d -s "$SESSION"
 
 # TERMINALS SESSION
-tmux rename-window -t 0 'TMUX'
+tmux rename-window -t 0 'tmux'
 tmux send-keys -t "$SESSION":0.0 "htop" C-m
 tmux split-window -t "$SESSION":0 -v -c "${COMPASS}"
 tmux send-keys -t "$SESSION":0.1 "ls" C-m
