@@ -170,6 +170,14 @@ reset
 sudo pacman -S --noconfirm k9s
 # </K9S>
 
+# <RIPGREP>
+sudo pacman -S --noconfirm ripgrep
+# </RIPGREP>
+
+# <GITUI>
+sudo pacman -S --noconfirm gitui
+# </GITUI>
+
 
 # <MONOSPACE>
 FONT_DIR="$HOME/Downloads"

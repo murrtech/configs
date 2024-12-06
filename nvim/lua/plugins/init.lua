@@ -64,5 +64,40 @@ return {
   {
     "kyazdani42/nvim-web-devicons", -- Add nvim-web-devicons plugin for vscode-icons
   },
+  {
+    "nvim-telescope/telescope.nvim",
+    opts = function()
+      require("telescope").setup {
+        defaults = {
+          file_ignore_patterns = {
+            "node_modules/.*", -- Ignore all subfolders/files in node_modules
+            "%.git/.*",        -- Ignore all subfolders/files in .git
+            "build/.*",        -- Ignore build folder recursively
+            "target/.*",       -- Ignore all subfolders/files in target
+            ".*%.lock",        -- Ignore lock files like yarn.lock or package-lock.json
+          },
+          layout_config = {
+            prompt_position = "top",  -- Position the input prompt at the top
+            width = 0.8,             -- Adjust width as a percentage of the window
+            height = 0.8,            -- Adjust height as a percentage of the window
+            border = true,           -- Enable borders for the Telescope UI
+          },
+          sorting_strategy = "ascending", -- Show results in ascending order
+          borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }, -- Custom border characters
+        },
+      }
+    end,
+  },
+  {
+    "folke/todo-comments.nvim",
+    dependencies = "nvim-lua/plenary.nvim",
+    config = function()
+      require("todo-comments").setup {}
+    end,
+  },
+  {
+    'nvim-telescope/telescope.nvim', tag = '0.1.8',
+      dependencies = { 'nvim-lua/plenary.nvim' }
+    }
+  
 }
-
