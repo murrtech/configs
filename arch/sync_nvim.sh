@@ -2,7 +2,7 @@
 
 # Define source and target paths
 CONFIG_PATH=~/Documents/compass/configs/nvim
-TARGET_PATH=~/.config/nvim/
+TARGET_PATH=~/.config/
 
 # Create the target directory if it doesn't exist
 mkdir -p "$TARGET_PATH"

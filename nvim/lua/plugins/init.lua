@@ -1,4 +1,3 @@
-
 -- ~/.config/nvim/lua/custom/plugins.lua
 
 return {
@@ -36,33 +35,23 @@ return {
     },
   },
   {
-    "simrat39/rust-tools.nvim", -- Add rust-tools.nvim plugin for Rust development
-    config = function()
-      require("rust-tools").setup {
-        server = {
-          on_attach = function(_, bufnr)
-            -- Add keymaps or other settings specific to Rust here
-          end,
-          settings = {
-            ["rust-analyzer"] = {
-              assist = {
-                importGranularity = "module",
-                importPrefix = "by_self",
-              },
-              cargo = {
-                loadOutDirsFromCheck = true,
-              },
-              procMacro = {
-                enable = true,
-              },
-            },
-          },
-        },
-      }
-    end,
+    'mrcjkb/rustaceanvim',
+    version = '^5', -- Recommended
+    lazy = false,   -- This plugin is already lazy
   },
   {
+    'saecki/crates.nvim',
+    ft = { 'toml' },
+    config = function()
+      require('crates').setup()
+    end,
+  },
+
+  {
     "kyazdani42/nvim-web-devicons", -- Add nvim-web-devicons plugin for vscode-icons
+  },
+  {
+    "mfussenegger/nvim-dap",
   },
   {
     "nvim-telescope/telescope.nvim",
@@ -76,28 +65,75 @@ return {
             "target/.*",       -- Ignore all subfolders/files in target
             ".*%.lock",        -- Ignore lock files like yarn.lock or package-lock.json
           },
-          layout_config = {
-            prompt_position = "top",  -- Position the input prompt at the top
-            width = 0.8,             -- Adjust width as a percentage of the window
-            height = 0.8,            -- Adjust height as a percentage of the window
-            border = true,           -- Enable borders for the Telescope UI
-          },
-          sorting_strategy = "ascending", -- Show results in ascending order
-          borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }, -- Custom border characters
         },
       }
     end,
   },
   {
     "folke/todo-comments.nvim",
-    dependencies = "nvim-lua/plenary.nvim",
-    config = function()
-      require("todo-comments").setup {}
-    end,
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    }
   },
   {
-    'nvim-telescope/telescope.nvim', tag = '0.1.8',
-      dependencies = { 'nvim-lua/plenary.nvim' }
-    }
-  
+    "hedyhli/outline.nvim",
+    lazy = true,
+    cmd = { "Outline", "OutlineOpen" },
+    keys = {
+      {
+        "<leader>o",
+        "<cmd>Outline<CR>",
+        desc = "Toggle outline"
+      }
+    },
+    config = function()
+      require("outline").setup({
+        outline_window = {
+          position = 'right',
+          width = 25,
+          auto_jump = true,
+        }
+      })
+    end
+  },
+  {
+    "folke/trouble.nvim",
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
+    cmd = "Trouble",
+    keys = {
+      {
+        "<leader>xx",
+        "<cmd>Trouble diagnostics toggle focus=true<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<leader>xX",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<leader>cs",
+        "<cmd>Trouble symbols toggle focus=false<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<leader>cl",
+        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        desc = "LSP Definitions / references / ... (Trouble)",
+      },
+      {
+        "<leader>xL",
+        "<cmd>Trouble loclist toggle<cr>",
+        desc = "Location List (Trouble)",
+      },
+      {
+        "<leader>xQ",
+        "<cmd>Trouble qflist toggle<cr>",
+        desc = "Quickfix List (Trouble)",
+      },
+    },
+  }
 }
