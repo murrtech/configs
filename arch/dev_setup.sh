@@ -75,12 +75,14 @@ done
 reset
 # </NEOVIM>
 
+
 # <YAY>
 sudo pacman -S --needed base-devel git
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
 # </YAY>
+
 
 # <ALACRITTY>
 sudo pacman -S --noconfirm alacritty
@@ -176,9 +178,11 @@ reset
 sudo pacman -S --noconfirm k9s
 # </K9S>
 
+
 # <RIPGREP>
 sudo pacman -S --noconfirm ripgrep
 # </RIPGREP>
+
 
 # <GITUI>
 sudo pacman -S --noconfirm gitui
