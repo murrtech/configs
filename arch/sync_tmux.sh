@@ -3,7 +3,7 @@
 # Define paths
 TMUX_CONFIG="$HOME/.tmux"
 SOURCE_CONFIG="$HOME/Documents/compass/configs/tmux"
-TPM_PATH="$TMUX_CONFIG/plugins/tpm"
+PLUGIN_SOURCE="$SOURCE_CONFIG/plugins"
 
 # Check if source directory exists
 if [ ! -d "$SOURCE_CONFIG" ]; then
@@ -13,34 +13,38 @@ fi
 
 # Create tmux config directory if it doesn't exist
 rm -rf "$TMUX_CONFIG"
-mkdir -p "$TMUX_CONFIG"
+mkdir -p "$TMUX_CONFIG/plugins"
 
-# Copy all files from source directory
+# Copy all configuration files except .git directories
 echo "Installing tmux configuration files..."
-cp -r "$SOURCE_CONFIG/." "$TMUX_CONFIG/"
+cp -r "$SOURCE_CONFIG/." "$TMUX_CONFIG/" 2>/dev/null
 
-# Install TPM if not present
-if [ ! -d "$TPM_PATH" ]; then
-    echo "Installing Tmux Plugin Manager..."
-    git clone https://github.com/tmux-plugins/tpm "$TPM_PATH"
-fi
+# Copy plugins from local repository, excluding .git directories
+echo "Installing plugins from local repository..."
+for plugin in "$PLUGIN_SOURCE"/*; do
+    if [ -d "$plugin" ]; then
+        plugin_name=$(basename "$plugin")
+        mkdir -p "$TMUX_CONFIG/plugins/$plugin_name"
+        
+        # Copy files excluding .git directory
+        find "$plugin" -type f -not -path "*/\.git/*" -exec cp --parents {} "$TMUX_CONFIG/plugins/$plugin_name/" \;
+        find "$plugin" -type d -not -path "*/\.git/*" -exec mkdir -p "$TMUX_CONFIG/plugins/$plugin_name/{}" \;
+    fi
+done
 
 # Set proper permissions
 chown -R $USER:$USER "$TMUX_CONFIG"
 find "$TMUX_CONFIG" -type f -exec chmod 644 {} \;
 find "$TMUX_CONFIG" -type d -exec chmod 755 {} \;
 find "$TMUX_CONFIG" -name "*.sh" -exec chmod +x {} \;
-chmod +x "$TPM_PATH/tpm"
-chmod +x "$TPM_PATH/scripts/install_plugins.sh"
-chmod +x "$TPM_PATH/scripts/update_plugin.sh"
-chmod +x "$TPM_PATH/scripts/clean_plugins.sh"
-chmod +x "$TPM_PATH/bin/install_plugins"
-chmod +x "$TPM_PATH/bin/clean_plugins"
-chmod +x "$TPM_PATH/bin/update_plugins"
+
+# Make plugin scripts executable
+find "$TMUX_CONFIG/plugins" -type f -name "*.sh" -exec chmod +x {} \;
+find "$TMUX_CONFIG/plugins" -type f -path "*/bin/*" -exec chmod +x {} \;
 
 # Check if the main config file exists
 if [ -f "$SOURCE_CONFIG/.tmux.conf" ]; then
-    # Create symlink to ~/.tmux.conf if it doesn't exist
+    # Create symlink to ~/.tmux.conf
     ln -sf "$TMUX_CONFIG/.tmux.conf" "$HOME/.tmux.conf"
     
     echo "New tmux configuration has been installed successfully!"
@@ -49,12 +53,9 @@ if [ -f "$SOURCE_CONFIG/.tmux.conf" ]; then
     if [ -n "$TMUX" ]; then
         echo "Sourcing new configuration..."
         tmux source-file "$HOME/.tmux.conf"
-        # Install plugins
-        echo "Installing tmux plugins..."
-        "$TPM_PATH/bin/install_plugins"
         echo "Configuration has been applied!"
     else
-        echo "No tmux session detected. Start tmux and press prefix + I to install plugins."
+        echo "No tmux session detected. Start tmux to use the new configuration."
     fi
 else
     echo "Error: Failed to find .tmux.conf in the configuration directory"

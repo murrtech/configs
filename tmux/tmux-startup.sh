@@ -4,7 +4,7 @@ set -x
 TIMESTAMP=$(date +%s)
 SESSION="${1:-WorkSession-$TIMESTAMP}"
 COMPASS="$HOME/Documents/compass/"
-COMPASS_SERVICES="$HOME/Documents/compass-services/"
+COMPASS_SERVICES="$HOME/Documents/compass/"
 
 tmux new-session -d -s "$SESSION"
 
