@@ -1,38 +1,192 @@
-# ~/.config/fish/config.fish
-set fish_greeting ""
+function fish_greeting
+    # ASCII art and header
+    set_color cyan
+    echo '╔════════════════════════════════════════════════════════════════════════════╗'
+    echo '║                        System Information                                  ║'
+    echo '╚════════════════════════════════════════════════════════════════════════════╝'
+    set_color normal
+
+    # System info with better formatting
+    set_color blue
+    echo -n "├─ OS:           "
+    set_color normal
+    echo (uname -rs)
+    
+    set_color blue
+    echo -n "├─ Kernel:       "
+    set_color normal
+    echo (uname -r)
+    
+    set_color blue
+    echo -n "├─ Shell:        "
+    set_color normal
+    echo (fish --version)
+    
+    set_color blue
+    echo -n "├─ Terminal:     "
+    set_color normal
+    echo $TERM
+    
+    set_color blue
+    echo -n "├─ Uptime:       "
+    set_color normal
+    echo (uptime -p | sed 's/up //')
+
+    # Memory section
+    set_color blue
+    echo "├─ Memory:"
+    set_color normal
+    echo "│  ├─ Total:    "(free -h | awk '/^Mem/ {print $2}')
+    echo "│  ├─ Used:     "(free -h | awk '/^Mem/ {print $3}')
+    echo "│  └─ Free:     "(free -h | awk '/^Mem/ {print $4}')
+    
+    # CPU section
+    set_color blue
+    echo "├─ CPU:"
+    set_color normal
+    echo "│  ├─ Load:     "(uptime | sed 's/.*load average: //')
+    echo "│  └─ Cores:    "(nproc)
+
+    # Storage section
+    set_color blue
+    echo "├─ Storage:"
+    set_color normal
+    echo "│  ├─ Total:    "(df -h / | awk 'NR==2 {print $2}')
+    echo "│  ├─ Used:     "(df -h / | awk 'NR==2 {print $3}')
+    echo "│  └─ Free:     "(df -h / | awk 'NR==2 {print $4}')
+
+    # Network section
+    set_color blue
+    echo "├─ Network:"
+    set_color normal
+    echo "│  └─ IP:       "(ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1 | head -n1)
+    
+
+    # Git configuration with better formatting
+    if command -v git > /dev/null
+        set -l git_name (git config --global user.name)
+        set -l git_email (git config --global user.email)
+        if test -n "$git_name" -a -n "$git_email"
+            set_color blue
+            echo "└─ Git Config:"
+            set_color normal
+            echo "   ├─ User:     $git_name"
+            echo "   └─ Email:    $git_email"
+        end
+    end
+    
+    echo # Empty line for spacing
+    
+    # Help tip with better formatting
+    set_color yellow
+    echo "Type 'help' for commands or 'fish_config' for configuration options"
+    set_color cyan
+    echo '════════════════════════════════════════════════════════════════════════════'
+    set_color normal
+end
+
+cd ~/Documents/compass 2>/dev/null; or cd ~
 
 if status is-interactive
     function fish_prompt
-        # Get current directory and parent
+        # Get current directory and three parent levels
         set -l current_dir (basename $PWD)
         set -l parent_dir (basename (dirname $PWD))
+        set -l grandparent_dir (basename (dirname (dirname $PWD)))
+        set -l great_grandparent_dir (basename (dirname (dirname (dirname $PWD))))
         
-        # Format the path display
-        set_color green
         # If we're in home directory, just show ~
         if test "$PWD" = "$HOME"
+            set_color cyan
             echo -n "~"
         else
             # If parent is home, show ~/current
             if test (dirname $PWD) = "$HOME"
-                echo -n "~/$current_dir"
+                set_color cyan
+                echo -n "~"
+                set_color red
+                echo -n "/"
+                set_color cyan
+                echo -n "$current_dir"
             else
-                # Show parent/current
-                echo -n "$parent_dir/$current_dir"
+                # If grandparent is home, show ~/parent/current
+                if test (dirname (dirname $PWD)) = "$HOME"
+                    set_color cyan
+                    echo -n "~"
+                    set_color red
+                    echo -n "/"
+                    set_color cyan
+                    echo -n "$parent_dir"
+                    set_color yellow
+                    echo -n "/"
+                    set_color cyan
+                    echo -n "$current_dir"
+                else
+                    # If great-grandparent is home, show ~/grandparent/parent/current
+                    if test (dirname (dirname (dirname $PWD))) = "$HOME"
+                        set_color cyan
+                        echo -n "~"
+                        set_color red
+                        echo -n "/"
+                        set_color cyan
+                        echo -n "$grandparent_dir"
+                        set_color yellow
+                        echo -n "/"
+                        set_color cyan
+                        echo -n "$parent_dir"
+                        set_color magenta
+                        echo -n "/"
+                        set_color cyan
+                        echo -n "$current_dir"
+                    else
+                        # Show great-grandparent/grandparent/parent/current
+                        set_color cyan
+                        echo -n "$great_grandparent_dir"
+                        set_color red
+                        echo -n "/"
+                        set_color cyan
+                        echo -n "$grandparent_dir"
+                        set_color yellow
+                        echo -n "/"
+                        set_color cyan
+                        echo -n "$parent_dir"
+                        set_color magenta
+                        echo -n "/"
+                        set_color cyan
+                        echo -n "$current_dir"
+                    end
+                end
             end
         end
         
-        # Git branch display
+        # Git information display
         if command -v git >/dev/null
-            set -l git_branch (git branch 2>/dev/null | sed -n '/\* /s///p')
-            if test -n "$git_branch"
-                set_color yellow
-                echo -n " ($git_branch)"
+            if git rev-parse --is-inside-work-tree >/dev/null 2>&1
+                set -l git_branch (git branch 2>/dev/null | sed -n '/\* /s///p')
+                set -l repo_name (basename (git rev-parse --show-toplevel 2>/dev/null))
+                if test -n "$git_branch"
+                    set_color yellow
+                    echo -n " ["
+                    set_color cyan
+                    echo -n "$repo_name"
+                    set_color white
+                    echo -n ":"
+                    set_color magenta
+                    echo -n "$git_branch"
+                    set_color yellow
+                    echo -n "]"
+                end
             end
         end
         
+        # New line with three colored carets
+        echo
+        set_color red
+        echo -n ">"
+        set_color yellow
+        echo -n ">"
         set_color green
-        echo -n ' > '
+        echo -n "> "
         set_color normal
     end
 end
