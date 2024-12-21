@@ -1,6 +1,3 @@
-# font download link
-# https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Monaspace.tar.xz
-
 [env]
 TERM = "xterm-256color"
 
