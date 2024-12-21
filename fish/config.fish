@@ -60,26 +60,15 @@ function fish_greeting
     echo "├─ Network:"
     set_color normal
     echo "│  └─ IP:       "(ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1 | head -n1)
-    
 
-    # Git configuration with better formatting
-    if command -v git > /dev/null
-        set -l git_name (git config --global user.name)
-        set -l git_email (git config --global user.email)
-        if test -n "$git_name" -a -n "$git_email"
-            set_color blue
-            echo "└─ Git Config:"
-            set_color normal
-            echo "   ├─ User:     $git_name"
-            echo "   └─ Email:    $git_email"
-        end
-    end
-    
     echo # Empty line for spacing
-    
     # Help tip with better formatting
     set_color yellow
-    echo "Type 'help' for commands or 'fish_config' for configuration options"
+    echo "Type 's_tmux' to synk TMUX files' "
+    echo "Type 's_fish' to synk fish files' "
+    echo "Type 's_nvim' to synk nvim files' "
+    echo "Type 's_alacritty' to synk alacritty files' "
+
     set_color cyan
     echo '════════════════════════════════════════════════════════════════════════════'
     set_color normal
@@ -159,26 +148,6 @@ if status is-interactive
             end
         end
         
-        # Git information display
-        if command -v git >/dev/null
-            if git rev-parse --is-inside-work-tree >/dev/null 2>&1
-                set -l git_branch (git branch 2>/dev/null | sed -n '/\* /s///p')
-                set -l repo_name (basename (git rev-parse --show-toplevel 2>/dev/null))
-                if test -n "$git_branch"
-                    set_color yellow
-                    echo -n " ["
-                    set_color cyan
-                    echo -n "$repo_name"
-                    set_color white
-                    echo -n ":"
-                    set_color magenta
-                    echo -n "$git_branch"
-                    set_color yellow
-                    echo -n "]"
-                end
-            end
-        end
-        
         # New line with three colored carets
         echo
         set_color red
@@ -241,9 +210,16 @@ alias fish_c='nvim ~/.config/fish/config.fish'
 alias alacritty_c='nvim ~/.config/alacritty/alacritty.toml'
 alias compass='cd ~/Documents/compass/'
 alias core='cd ~/Documents/compass/core/'
+alias tk='tmux kill-server'
 alias git_compass='cd ~/Documents/compass/ && lazygit'
 alias compass_services='cd ~/Documents/compass-services/'
 alias ls='exa --tree --level=1 --only-dirs --icons'
+alias tmux=_tmux
+alias s_tmux="$HOME/Documents/compass/configs/arch/sync_tmux.sh"
+alias s_fish="$HOME/Documents/compass/configs/arch/sync_fish.sh"
+alias s_nvim="$HOME/Documents/compass/configs/arch/sync_nvim.sh"
+alias s_alacritty="$HOME/Documents/compass/configs/arch/sync_alacritty.sh"
+
 alias .='cd ..'
 
 # Add this after your aliases:
@@ -256,5 +232,22 @@ function cd
     else
         builtin cd ~
         and exa --tree --level=1 --icons 
+    end
+end
+
+function _tmux
+    if test (count $argv) -eq 0
+        # Check if any tmux sessions exist
+        if command tmux ls 2>/dev/null
+            # Sessions exist, attach and show session tree
+            command tmux attach \; choose-tree -s
+        else
+            # No sessions exist, create a new one with name
+            read -P "Enter session name: " session_name
+            command tmux new -s $session_name
+        end
+    else
+        # If arguments provided, pass them through to tmux
+        command tmux $argv
     end
 end
