@@ -68,9 +68,8 @@ function fish_greeting
     echo "Type 's_fish' to synk fish files' "
     echo "Type 's_nvim' to synk nvim files' "
     echo "Type 's_alacritty' to synk alacritty files' "
-
+z
     set_color cyan
-    echo '════════════════════════════════════════════════════════════════════════════'
     set_color normal
 end
 
