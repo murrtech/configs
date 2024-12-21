@@ -243,7 +243,7 @@ alias compass='cd ~/Documents/compass/'
 alias core='cd ~/Documents/compass/core/'
 alias git_compass='cd ~/Documents/compass/ && lazygit'
 alias compass_services='cd ~/Documents/compass-services/'
-alias ls='exa --tree --level=2 --icons --group-directories-first'
+alias ls='exa --tree --level=1 --only-dirs --icons'
 alias .='cd ..'
 
 # Add this after your aliases:
@@ -252,9 +252,9 @@ alias .='cd ..'
 function cd
     if test (count $argv) -gt 0
         builtin cd $argv
-        and exa --tree --level=1 --icons --group-directories-first
+        and exa --tree --level=1 --icons 
     else
         builtin cd ~
-        and exa --tree --level=1 --icons --group-directories-first
+        and exa --tree --level=1 --icons 
     end
 end
