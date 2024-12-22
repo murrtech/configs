@@ -30,7 +30,7 @@ return {
     opts = {
       ensure_installed = {
         "vim", "lua", "vimdoc",
-        "html", "css", "rust" -- Add rust parser for syntax highlighting
+        "html", "css", "rust", "toml", "yaml", "python", "json" -- Add rust parser for syntax highlighting
       },
     },
   },

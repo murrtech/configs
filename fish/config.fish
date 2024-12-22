@@ -32,48 +32,11 @@ function fish_greeting
     set_color normal
     echo (uptime -p | sed 's/up //')
 
-    # Memory section
-    set_color blue
-    echo "├─ Memory:"
-    set_color normal
-    echo "│  ├─ Total:    "(free -h | awk '/^Mem/ {print $2}')
-    echo "│  ├─ Used:     "(free -h | awk '/^Mem/ {print $3}')
-    echo "│  └─ Free:     "(free -h | awk '/^Mem/ {print $4}')
-    
-    # CPU section
-    set_color blue
-    echo "├─ CPU:"
-    set_color normal
-    echo "│  ├─ Load:     "(uptime | sed 's/.*load average: //')
-    echo "│  └─ Cores:    "(nproc)
-
-    # Storage section
-    set_color blue
-    echo "├─ Storage:"
-    set_color normal
-    echo "│  ├─ Total:    "(df -h / | awk 'NR==2 {print $2}')
-    echo "│  ├─ Used:     "(df -h / | awk 'NR==2 {print $3}')
-    echo "│  └─ Free:     "(df -h / | awk 'NR==2 {print $4}')
-
-    # Network section
-    set_color blue
-    echo "├─ Network:"
-    set_color normal
-    echo "│  └─ IP:       "(ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1 | head -n1)
-
     echo # Empty line for spacing
-    # Help tip with better formatting
     set_color yellow
-    echo "Type 's_tmux' to synk TMUX files' "
-    echo "Type 's_fish' to synk fish files' "
-    echo "Type 's_nvim' to synk nvim files' "
-    echo "Type 's_gitui' to synk s_gitui files' "
-    echo "Type 's_alacritty' to synk alacritty files' "
-    echo "Type 's_firefox' to synk firefox files' "
-    echo "Type 's_newsboat' to synk newsboat files' "
-    echo "Type 'd_config' to navigate to compass/config"
-    echo "Type 'd_compass' to navigate to /compass"
-    set_color cyan
+    echo "Sync Commands: s_[tmux|fish|nvim|gitui|alacritty|firefox|newsboat]"
+    echo "Navigate To:   d_[config|compass]"
+    echo
     set_color normal
 end
 
@@ -162,53 +125,25 @@ if status is-interactive
         echo -n "> "
         set_color normal
     end
+    set_color normal
 end
 
 # Set FZF default command to use `fd` for finding files
 set -x FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
-
-function colorstuff
-    while read -l input
-        switch $input
-            case "*error*"
-                set_color red
-                echo $input
-                set_color normal
-            case "*warning*"
-                set_color yellow
-                echo $input
-                set_color normal
-            case "*success*"
-                set_color green
-                echo $input
-                set_color normal
-            case "*info*"
-                set_color blue
-                echo $input
-                set_color normal
-            case "*"
-                echo $input
-        end
-    end
-    set_color normal 
-end
 
 # Path configurations
 set -gx PATH $HOME/.cargo/bin $PATH
 set -gx PATH $HOME/Downloads/nvim-linux64/bin $PATH
 set -gx PATH $PATH $HOME/.linkerd2/bin
 set -gx KUBECONFIG "/home/ben/Downloads/k8s-services-kubeconfig.yaml"
-
-# Editor configurations
+set -gx COLORTERM truecolor
+set -gx TERM_PROGRAM alacritty
 set -gx VISUAL nvim
 set -gx EDITOR nvim
-
-# Environment variables
 set -x DESIRED_MEM 24576
 set -x PROTOC /usr/bin/protoc
 set -x CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG true
-set -gx COLORTERM truecolor
-set -gx TERM_PROGRAM alacritty
+
 
 # Aliases
 alias nvim_c='cd ~/.config/nvim/ && nvim'
@@ -235,8 +170,6 @@ alias d_compass="cd $HOME/Documents/compass/ && nvim"
 
 alias .='cd ..'
 
-# trif payo hpwd tkyn
-
 # Function to run ls after cd
 function cd
     if test (count $argv) -gt 0
@@ -249,25 +182,34 @@ function cd
 end
 
 function _tmux
-    # No arguments provided
-    if test (count $argv) -eq 0
-        # Check if any tmux sessions exist
-        if command tmux ls 2>/dev/null
-            # Sessions exist, attach to the last session and show the session tree
-            command tmux attach \; choose-tree -s
-        else
-            # No sessions exist, prompt user for a session name
-            read -P "Enter session name: " session_name
-            if test -n "$session_name"
-                # Create a new session with the provided name
-                command tmux new -s $session_name
-            else
-                echo "No session name provided. Aborting."
-            end
-        end
-    else
-        # If arguments provided, pass them through to tmux
-        command tmux $argv
-    end
+   # No arguments provided
+   if test (count $argv) -eq 0
+       # Check if any tmux sessions exist
+       set -l sessions (command tmux ls 2>/dev/null)
+       
+       if test -n "$sessions"
+           # Get number of sessions
+           set -l session_count (count $sessions)
+           
+           if test $session_count -eq 1
+               # If only one session, attach to it
+               command tmux attach
+           else
+               # Show selection menu for multiple sessions
+               command tmux attach \; choose-tree -Zs
+           end
+       else
+           # No sessions exist, prompt user for a session name
+           read -P "Enter session name: " session_name
+           if test -n "$session_name"
+               # Create a new session with the provided name
+               command tmux new -s $session_name
+           else
+               echo "No session name provided. Aborting."
+           end
+       end
+   else
+       # If arguments provided, pass them through to tmux
+       command tmux $argv
+   end
 end
-

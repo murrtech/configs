@@ -1,6 +1,5 @@
 [env]
-TERM = "tmux-256color"  # Match your tmux environment
-
+TERM = "alacritty"
 [font]
 size = 11
 
@@ -22,34 +21,3 @@ dynamic_title = true
 x = 0
 y = 0
 
-
-[colors]
-draw_bold_text_with_bright_colors = true
-transparent_background_colors = false
-
-
-
-
-[colors.cursor]
-text = "0x0d1117"
-cursor = "0xc9d1d9"
-
-[colors.normal]
-black = "0x484f58"
-red = "0xff7b72"
-green = "0x3fb950"    # Changed to actual Github green
-yellow = "0xd29922"
-blue = "0x58a6ff"
-magenta = "0xbc8cff"
-cyan = "0x39c5cf"
-white = "0xb1bac4"
-
-[colors.bright]
-black = "0x6e7681"
-red = "0xffa198"
-green = "0x56d364"    # Different from normal green
-yellow = "0xe3b341"
-blue = "0x79c0ff"
-magenta = "0xd2a8ff"  # Different from normal magenta
-cyan = "0x56d4dd"     # Different from normal cyan
-white = "0xb1bac4"
