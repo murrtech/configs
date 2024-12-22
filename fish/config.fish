@@ -67,8 +67,10 @@ function fish_greeting
     echo "Type 's_tmux' to synk TMUX files' "
     echo "Type 's_fish' to synk fish files' "
     echo "Type 's_nvim' to synk nvim files' "
+    echo "Type 's_gitui' to synk s_gitui files' "
     echo "Type 's_alacritty' to synk alacritty files' "
-z
+    echo "Type 's_firefox' to synk firefox files' "
+
     set_color cyan
     set_color normal
 end
@@ -218,6 +220,8 @@ alias s_tmux="$HOME/Documents/compass/configs/arch/sync_tmux.sh"
 alias s_fish="$HOME/Documents/compass/configs/arch/sync_fish.sh"
 alias s_nvim="$HOME/Documents/compass/configs/arch/sync_nvim.sh"
 alias s_alacritty="$HOME/Documents/compass/configs/arch/sync_alacritty.sh"
+alias s_gitui="$HOME/Documents/compass/configs/arch/sync_gitui.sh"
+alias s_firefox="$HOME/Documents/compass/configs/arch/sync_firefox.sh"
 
 alias .='cd ..'
 
