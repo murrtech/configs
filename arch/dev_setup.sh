@@ -184,6 +184,11 @@ sudo pacman -S --noconfirm ripgrep
 # </RIPGREP>
 
 
+# <GitHub CLI>
+sudo pacman -S --noconfirm github-cli
+# </GitHub CLI>
+
+
 # <GITUI>
 sudo pacman -S --noconfirm gitui
 # </GITUI>
@@ -275,3 +280,4 @@ sudo systemctl start systemd-resolved
 # </MISC>
 
 echo "Installation completed successfully!"
+echo "Still need to authenticate GitHub user through 'gh auth'!"
