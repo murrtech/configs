@@ -70,6 +70,7 @@ function fish_greeting
     echo "Type 's_gitui' to synk s_gitui files' "
     echo "Type 's_alacritty' to synk alacritty files' "
     echo "Type 's_firefox' to synk firefox files' "
+    echo "Type 's_newsboat' to synk newsboat files' "
     echo "Type 'd_config' to navigate to compass/config"
     echo "Type 'd_compass' to navigate to /compass"
     set_color cyan
@@ -80,6 +81,7 @@ cd ~/Documents/compass 2>/dev/null; or cd ~
 
 if status is-interactive
     function fish_prompt
+        set_color normal
         # Get current directory and three parent levels
         set -l current_dir (basename $PWD)
         set -l parent_dir (basename (dirname $PWD))
@@ -188,6 +190,7 @@ function colorstuff
                 echo $input
         end
     end
+    set_color normal 
 end
 
 # Path configurations
@@ -204,6 +207,8 @@ set -gx EDITOR nvim
 set -x DESIRED_MEM 24576
 set -x PROTOC /usr/bin/protoc
 set -x CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG true
+set -gx COLORTERM truecolor
+set -gx TERM_PROGRAM alacritty
 
 # Aliases
 alias nvim_c='cd ~/.config/nvim/ && nvim'
@@ -223,6 +228,7 @@ alias s_nvim="$HOME/Documents/compass/configs/arch/sync_nvim.sh"
 alias s_alacritty="$HOME/Documents/compass/configs/arch/sync_alacritty.sh"
 alias s_gitui="$HOME/Documents/compass/configs/arch/sync_gitui.sh"
 alias s_firefox="$HOME/Documents/compass/configs/arch/sync_firefox.sh"
+alias s_newsboat="$HOME/Documents/compass/configs/arch/sync_newsboat.sh"
 alias d_config="cd $HOME/Documents/compass/configs/ && nvim"
 alias d_orch="cd $HOME/Documents/compass/orch && nvim"
 alias d_compass="cd $HOME/Documents/compass/ && nvim"

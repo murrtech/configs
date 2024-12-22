@@ -189,6 +189,11 @@ sudo pacman -S --noconfirm github-cli
 # </GitHub CLI>
 
 
+# <NEWSBOAT>
+sudo pacman -S --noconfirm newsboat
+# </ CLI>
+
+
 # <GITUI>
 sudo pacman -S --noconfirm gitui
 # </GITUI>
