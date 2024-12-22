@@ -2,5 +2,4 @@
     command_fg: Some("#E6EDF3"),  // Brighter and softer foreground for commands
     selection_bg: Some("#444C56"),  // Neutral and noticeable selection background
     cmdbar_bg: Some("#24292E"),  // Better contrast for the command bar background
-
 )
