@@ -70,7 +70,8 @@ function fish_greeting
     echo "Type 's_gitui' to synk s_gitui files' "
     echo "Type 's_alacritty' to synk alacritty files' "
     echo "Type 's_firefox' to synk firefox files' "
-
+    echo "Type 'd_config' to navigate to compass/config"
+    echo "Type 'd_compass' to navigate to /compass"
     set_color cyan
     set_color normal
 end
@@ -222,10 +223,13 @@ alias s_nvim="$HOME/Documents/compass/configs/arch/sync_nvim.sh"
 alias s_alacritty="$HOME/Documents/compass/configs/arch/sync_alacritty.sh"
 alias s_gitui="$HOME/Documents/compass/configs/arch/sync_gitui.sh"
 alias s_firefox="$HOME/Documents/compass/configs/arch/sync_firefox.sh"
+alias d_config="cd $HOME/Documents/compass/configs/ && nvim"
+alias d_orch="cd $HOME/Documents/compass/orch && nvim"
+alias d_compass="cd $HOME/Documents/compass/ && nvim"
 
 alias .='cd ..'
 
-# Add this after your aliases:
+# trif payo hpwd tkyn
 
 # Function to run ls after cd
 function cd
@@ -239,18 +243,25 @@ function cd
 end
 
 function _tmux
+    # No arguments provided
     if test (count $argv) -eq 0
         # Check if any tmux sessions exist
         if command tmux ls 2>/dev/null
-            # Sessions exist, attach and show session tree
+            # Sessions exist, attach to the last session and show the session tree
             command tmux attach \; choose-tree -s
         else
-            # No sessions exist, create a new one with name
+            # No sessions exist, prompt user for a session name
             read -P "Enter session name: " session_name
-            command tmux new -s $session_name
+            if test -n "$session_name"
+                # Create a new session with the provided name
+                command tmux new -s $session_name
+            else
+                echo "No session name provided. Aborting."
+            end
         end
     else
         # If arguments provided, pass them through to tmux
         command tmux $argv
     end
 end
+

@@ -193,6 +193,10 @@ sudo pacman -S --noconfirm github-cli
 sudo pacman -S --noconfirm gitui
 # </GITUI>
 
+# <MUTT>
+yay -S mutt-wizard isync msmtp pass abook notmuch
+# </MUTT>
+
 
 # <MONOSPACE>
 FONT_DIR="$HOME/Downloads"
@@ -276,7 +280,6 @@ sudo systemctl enable systemd-resolved
 sudo systemctl start systemd-resolved
 
 
-# tmux source ~/.tmux.conf
 # </MISC>
 
 echo "Installation completed successfully!"
