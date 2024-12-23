@@ -5,6 +5,8 @@
 # your terminal emulator to use the Solarized palette.
 # See <http://ethanschoonover.com/solarized/> for more information.
 
+browser "~/scripts/focus-firefox.sh %u"
+
 color background         default   default
 color listnormal         default   default
 color listnormal_unread  default   default

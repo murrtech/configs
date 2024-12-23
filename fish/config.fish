@@ -184,32 +184,10 @@ end
 function _tmux
    # No arguments provided
    if test (count $argv) -eq 0
-       # Check if any tmux sessions exist
-       set -l sessions (command tmux ls 2>/dev/null)
-       
-       if test -n "$sessions"
-           # Get number of sessions
-           set -l session_count (count $sessions)
-           
-           if test $session_count -eq 1
-               # If only one session, attach to it
-               command tmux attach
-           else
-               # Show selection menu for multiple sessions
-               command tmux attach \; choose-tree -Zs
-           end
-       else
-           # No sessions exist, prompt user for a session name
-           read -P "Enter session name: " session_name
-           if test -n "$session_name"
-               # Create a new session with the provided name
-               command tmux new -s $session_name
-           else
-               echo "No session name provided. Aborting."
-           end
-       end
+       # Create or attach to main session then send the key sequence for prefix + s
+       command tmux new-session -A -s main \; send-keys C-b s
    else
-       # If arguments provided, pass them through to tmux
+       # Pass through any tmux arguments
        command tmux $argv
    end
 end
