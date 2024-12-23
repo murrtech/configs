@@ -1,10 +1,20 @@
-# Tech News
-https://news.ycombinator.com/rss "tech"
-https://archlinux.org/feeds/news/ "tech" "linux"
-https://www.phoronix.com/rss.php "tech" "linux"
-https://itsfoss.com/feed/ "tech" "linux"
-https://www.linuxjournal.com/node/feed "tech" "linux"
+# Computer Science Research
+https://export.arxiv.org/rss/cs.AI "research" "ai"          # AI research
+https://export.arxiv.org/rss/cs.LG "research" "ml"          # Machine Learning
+https://export.arxiv.org/rss/cs.SE "research" "software"    # Software Engineering
+https://export.arxiv.org/rss/cs.DC "research" "distributed" # Distributed Computing
+https://export.arxiv.org/rss/cs.DB "research" "databases"   # Databases
+https://export.arxiv.org/rss/cs.PL "research" "languages"   # Programming Languages
+https://export.arxiv.org/rss/cs.NE "research" "neural"      # Neural/Evolution
 
-# Reddit Linux News
-https://www.reddit.com/r/linux/.rss "reddit" "linux"
-https://www.reddit.com/r/archlinux/.rss "reddit" "linux"
+# Academic Journals
+https://dl.acm.org/action/showFeed?type=etoc&feed=rss&jc=tosem "research" "software" # ACM Trans on Software Engineering
+https://ieeexplore.ieee.org/rss/TOC34.XML "research" "systems"                       # IEEE Trans on Software Engineering
+https://www.nature.com/nature.rss "research" "science"                               # Nature
+https://science.sciencemag.org/rss/express.xml "research" "science"                  # Science
+
+# Research Labs & Organizations
+https://ai.googleblog.com/feeds/posts/default "research" "google"
+https://research.fb.com/feed/ "research" "meta"
+https://blog.research.google/feeds/posts/default "research" "google"
+https://deepmind.com/blog/feed/basic/ "research" "ai"
