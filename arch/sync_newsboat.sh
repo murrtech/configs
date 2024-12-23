@@ -32,8 +32,8 @@ for file in "${CONFIG_FILES[@]}"; do
     else
         chmod 644 "$NEWSBOAT_CONFIG_DIR/$file"
     fi
-
     echo "Installed $file successfully!"
 done
 
+newsboat -r
 echo "Newsboat configuration has been synced successfully!"

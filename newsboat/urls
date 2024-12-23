@@ -14,7 +14,6 @@ https://www.nature.com/nature.rss "research" "science"                          
 https://science.sciencemag.org/rss/express.xml "research" "science"                  # Science
 
 # Research Labs & Organizations
-https://ai.googleblog.com/feeds/posts/default "research" "google"
 https://research.fb.com/feed/ "research" "meta"
 https://blog.research.google/feeds/posts/default "research" "google"
 https://deepmind.com/blog/feed/basic/ "research" "ai"
