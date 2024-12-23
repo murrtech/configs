@@ -143,7 +143,7 @@ set -gx EDITOR nvim
 set -x DESIRED_MEM 24576
 set -x PROTOC /usr/bin/protoc
 set -x CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG true
-
+set -x K8S_OPENAPI_ENABLED_VERSION 1.32
 
 # Aliases
 alias nvim_c='cd ~/.config/nvim/ && nvim'
