@@ -52,7 +52,7 @@ for _, lsp in ipairs(servers) do
    on_init = nvlsp.on_init,
    capabilities = nvlsp.capabilities,
    flags = {
-     debounce_text_changes = 50,  -- Reduce delay before sending changes to LSP
+     debounce_text_changes = 40,  -- Reduce delay before sending changes to LSP
    },
  }
 end
