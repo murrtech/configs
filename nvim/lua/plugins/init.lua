@@ -85,14 +85,14 @@ return {
     keys = {
       {
         "<leader>o",
-        "<cmd>Outline<CR>",
+        "<cmd>belowright Outline<CR>",
         desc = "Toggle outline"
       }
     },
     config = function()
       require("outline").setup({
         outline_window = {
-          position = 'right',
+          position = 'bottom',
           width = 25,
           auto_jump = true,
         }
