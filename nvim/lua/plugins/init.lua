@@ -3,13 +3,16 @@
 return {
   {
     "stevearc/conform.nvim",
-    event = "BufWritePre", -- uncomment for format on save
+    event = "BufWritePre",
     config = function()
       require "configs.conform"
     end,
   },
   {
     "neovim/nvim-lspconfig",
+    opts = {
+      inlay_hints = { enabled = true },
+    },
     config = function()
       require("nvchad.configs.lspconfig").defaults()
       require "configs.lspconfig"
@@ -24,62 +27,77 @@ return {
         "html-lsp",
         "css-lsp",
         "prettier",
-        "rust-analyzer",
         "typescript-language-server",
         "emmet-ls",
         "json-lsp",
         "shfmt",
         "shellcheck",
+        "rust-analyzer",
       },
     },
   },
   { "rcarriga/nvim-dap-ui", dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } },
 
-  -- In your plugin management file (e.g., lua/plugins/init.lua):
+  -- Example: Integrating RustaceanVim (rust-analyzer settings) with inlay-hints.nvim
+
+  -- 1) Add/Configure the "inlay-hints.nvim" plugin
   {
-    -- Make sure you remove or replace "version = '^5'" with a branch or a valid tag
-    -- so that you pull in a version with the `setup` function available.
-    "mrcjkb/rustaceanvim",
-    branch = "main", -- or remove this line entirely; just ensure you get a recent version
-    dependencies = {
-      "nvim-lua/plenary.nvim", -- required dependency
-      "neovim/nvim-lspconfig", -- typically you'll have this anyway
-      "mfussenegger/nvim-dap", -- optional, but recommended for debugging
-    },
-    lazy = false, -- ensure it loads immediately (you can change this based on preference)
+    "MysticalDevil/inlay-hints.nvim",
+    event = "LspAttach",
+    dependencies = { "neovim/nvim-lspconfig" },
     config = function()
-      -- If you're still getting "attempt to call field 'setup' (a nil value)",
-      -- it likely means your plugin is not installed/updated or pinned to an old commit.
-      -- Run `:Lazy sync` or `:PackerSync`, depending on your plugin manager.
-      --
-      require("rustaceanvim").setup {
-        -- Example: pass your rust-analyzer config. This merges with rust-tools internally.
-        lsp = {
-          server = {
-            capabilities = require("nvchad.configs.lspconfig").capabilities,
+      require("inlay-hints").setup {
+        commands = { enable = true }, -- Adds :InlayHintsToggle / :InlayHintsEnable / :InlayHintsDisable
+        autocmd = { enable = true }, -- Automatically attach inlay hints for all LSP servers that support them
+      }
+    end,
+  },
 
-            on_attach = function(client, bufnr)
-              require("nvchad.configs.lspconfig").on_attach(client, bufnr)
-              if type(vim.lsp.inlay_hint) == "function" and client.name == "rust_analyzer" then
-                vim.lsp.inlay_hint(bufnr, true)
-              end
-            end,
+  -- 2) Configure RustaceanVim so it applies your rust-analyzer settings
+  --    If you *only* want the plugin's built-in autocmd to handle hints, you do NOT
+  --    need to call `require("inlay-hints").on_attach(client, bufnr)` manually.
 
-            settings = {
-              ["rust-analyzer"] = {
-                inlayHints = {
-                  locationLinks = false,
-                  lifetimeElisionHints = { enable = "always", useParameterNames = true },
-                  reborrowHints = { enable = "always" },
-                  bindingModeHints = { enable = true },
-                  closingBraceHints = { enable = false },
-                  typeHints = { enable = true },
-                  chainingHints = { enable = true },
-                  parameterHints = { enable = true },
+  {
+    "mrcjkb/rustaceanvim",
+    version = "^5",
+    lazy = false,
+    config = function()
+      vim.g.rustaceanvim = {
+        server = {
+          -- If you want to override rust-analyzer inlay-hints config:
+          settings = {
+            ["rust-analyzer"] = {
+              inlayHints = {
+                bindingModeHints = { enable = false },
+                chainingHints = { enable = true },
+                closingBraceHints = {
+                  enable = true,
+                  minLines = 25,
+                },
+                closureReturnTypeHints = { enable = "never" },
+                lifetimeElisionHints = {
+                  enable = "never",
+                  useParameterNames = false,
+                },
+                maxLength = 25,
+                parameterHints = { enable = true },
+                reborrowHints = { enable = "never" },
+                renderColons = true,
+                typeHints = {
+                  enable = true,
+                  hideClosureInitialization = false,
+                  hideNamedConstructor = false,
                 },
               },
             },
           },
+
+          -- If you prefer manual attachment rather than the built-in autocmd, do this:
+          on_attach = function(client, bufnr)
+            -- NVChad or user keymaps etc. go here
+            -- Then manually enable the inlay-hints.nvim plugin:
+            -- require("inlay-hints").on_attach(client, bufnr)
+          end,
         },
       }
     end,
