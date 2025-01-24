@@ -37,67 +37,69 @@ return {
     },
   },
   { "rcarriga/nvim-dap-ui", dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } },
-
-  -- Example: Integrating RustaceanVim (rust-analyzer settings) with inlay-hints.nvim
-
-  -- 1) Add/Configure the "inlay-hints.nvim" plugin
   {
     "MysticalDevil/inlay-hints.nvim",
     event = "LspAttach",
     dependencies = { "neovim/nvim-lspconfig" },
     config = function()
       require("inlay-hints").setup {
-        commands = { enable = true }, -- Adds :InlayHintsToggle / :InlayHintsEnable / :InlayHintsDisable
-        autocmd = { enable = true }, -- Automatically attach inlay hints for all LSP servers that support them
+        -- Let it automatically attach to all servers that support inlay hints
+        autocmd = { enable = true },
+        -- Commands provide :InlayHintsToggle, :InlayHintsEnable, :InlayHintsDisable
+        commands = { enable = true },
       }
     end,
   },
 
-  -- 2) Configure RustaceanVim so it applies your rust-analyzer settings
-  --    If you *only* want the plugin's built-in autocmd to handle hints, you do NOT
-  --    need to call `require("inlay-hints").on_attach(client, bufnr)` manually.
-
   {
     "mrcjkb/rustaceanvim",
     version = "^5",
-    lazy = false,
+    lazy = false, -- load immediately (or change to your preference)
     config = function()
       vim.g.rustaceanvim = {
+        -- RustaceanVim uses rust-tools.nvim behind the scenes
+        -- to configure & manage rust-analyzer.
         server = {
-          -- If you want to override rust-analyzer inlay-hints config:
+          -- If you prefer using Mason’s rust-analyzer, set:
+          -- cmd = { vim.fn.stdpath("data") .. "/mason/bin/rust-analyzer" },
+
+          on_attach = function(client, bufnr)
+            -- If you want to manually attach inlay-hints (instead of autocmd),
+            -- uncomment this:
+            -- require("inlay-hints").on_attach(client, bufnr)
+          end,
+
           settings = {
             ["rust-analyzer"] = {
+              checkOnSave = {
+                command = "clippy", -- or "cargo check"
+              },
+              diagnostics = {
+                enable = true,
+              },
+              -- Tweak inlayHints to your liking:
               inlayHints = {
-                bindingModeHints = { enable = false },
+                -- Example: show chaining & parameter hints
                 chainingHints = { enable = true },
-                closingBraceHints = {
-                  enable = true,
-                  minLines = 25,
-                },
-                closureReturnTypeHints = { enable = "never" },
-                lifetimeElisionHints = {
-                  enable = "never",
-                  useParameterNames = false,
-                },
-                maxLength = 25,
                 parameterHints = { enable = true },
+                typeHints = { enable = true },
+                bindingModeHints = { enable = false },
                 reborrowHints = { enable = "never" },
-                renderColons = true,
-                typeHints = {
-                  enable = true,
-                  hideClosureInitialization = false,
-                  hideNamedConstructor = false,
-                },
+                closureReturnTypeHints = { enable = "never" },
+                maxLength = 25,
+                renderColons = false,
               },
             },
           },
+        },
 
-          -- If you prefer manual attachment rather than the built-in autocmd, do this:
-          on_attach = function(client, bufnr)
-            -- NVChad or user keymaps etc. go here
-            -- Then manually enable the inlay-hints.nvim plugin:
-            -- require("inlay-hints").on_attach(client, bufnr)
-          end,
+        -- Additional RustaceanVim config if needed
+        tools = {
+          -- rust-tools-specific settings, e.g. hover actions or code lens
+        },
+
+        dap = {
+          -- Debug settings if you want to configure nvim-dap
         },
       }
     end,
