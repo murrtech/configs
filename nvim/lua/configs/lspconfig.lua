@@ -30,17 +30,7 @@ local severity_to_name = {
 vim.o.updatetime = 100
 
 vim.diagnostic.config {
-  virtual_text = {
-    prefix = "", -- We'll provide the icon from format() instead
-    spacing = -5, -- Space after the icon
-    format = function(diagnostic)
-      local sev_name = severity_to_name[diagnostic.severity]
-      -- If for some reason there's no mapping, use a fallback bullet
-      local icon = signs[sev_name] or "●"
-      -- Return the icon only; no message text
-      return icon
-    end,
-  },
+  virtual_text = false,
   signs = true, -- Gutter icons
   underline = true, -- Undercurls
   update_in_insert = true,
@@ -48,19 +38,26 @@ vim.diagnostic.config {
   float = { border = "single" },
 }
 
--- 4) Show the diagnostic float after pausing briefly in normal & insert modes
-vim.api.nvim_create_autocmd("CursorHold", {
+vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
   callback = function()
-    vim.diagnostic.open_float(nil, { focus = false })
-  end,
-})
-vim.api.nvim_create_autocmd("CursorHoldI", {
-  callback = function()
-    vim.diagnostic.open_float(nil, { focus = false })
-  end,
-})
+    local cursor_pos = vim.api.nvim_win_get_cursor(0)
+    local line = cursor_pos[1] - 1
+    local col = cursor_pos[2]
+    local diagnostics = vim.diagnostic.get(0, { lnum = line })
 
--- 5) Apply the gutter signs with their respective icons
+    local show_float = false
+    for _, d in ipairs(diagnostics) do
+      if d.lnum == line and col >= d.col and col <= (d.end_col or d.col + 1) then
+        show_float = true
+        break
+      end
+    end
+
+    if show_float then
+      vim.diagnostic.open_float(nil, { focus = false })
+    end
+  end,
+})
 for type, icon in pairs(signs) do
   local hl = "DiagnosticSign" .. type
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
@@ -93,3 +90,45 @@ for _, lsp in ipairs(servers) do
     capabilities = nvlsp.capabilities,
   }
 end
+
+-- 1) Save the original underline handler so we can wrap it.
+local original_underline = vim.diagnostic.handlers.underline
+
+-- 2) Override the underline handler.
+vim.diagnostic.handlers.underline = {
+  show = function(namespace, bufnr, diagnostics, opts)
+    for _, diag in ipairs(diagnostics) do
+      -- Check if the diagnostic has a valid .range
+      if diag.range and diag.range["start"] and diag.range["end"] then
+        local start_row = diag.range["start"].line
+        local start_col = diag.range["start"].character
+        local line_text = vim.api.nvim_buf_get_lines(bufnr, start_row, start_row + 1, false)[1]
+
+        if line_text then
+          -- Attempt to find the first token in the line
+          local sub = line_text:sub(start_col + 1)
+          local first_token_start, first_token_end = sub:find "%S+"
+
+          if first_token_start and first_token_end then
+            local token_abs_start = start_col + first_token_start - 1
+            local token_abs_end = start_col + first_token_end - 1
+
+            -- Force the highlight range to just that token
+            diag.range["start"].character = token_abs_start
+            diag.range["end"].character = token_abs_end
+          else
+            -- If no token, highlight a single character
+            diag.range["end"].character = start_col + 1
+          end
+        end
+      end
+    end
+
+    -- Pass modified diagnostics to the original underline handler
+    original_underline.show(namespace, bufnr, diagnostics, opts)
+  end,
+
+  hide = function(namespace, bufnr)
+    original_underline.hide(namespace, bufnr)
+  end,
+}
