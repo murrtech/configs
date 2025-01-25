@@ -62,8 +62,9 @@ return {
 
         server = {
           on_attach = function(client, bufnr)
-            -- If you manually attach hints from inlay-hints.nvim or similar,
-            -- do that here. But if you're relying purely on rust-tools, no extra call needed.
+            vim.keymap.set("n", "<F12>", function()
+              vim.lsp.buf.definition()
+            end, { buffer = bufnr, desc = "Go to Definition" })
           end,
           default_settings = {
             ["rust-analyzer"] = {
