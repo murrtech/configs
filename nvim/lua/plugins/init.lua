@@ -168,6 +168,7 @@ return {
       "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
+      require "configs.dap" -- Add this line
       local dap = require "dap"
 
       vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "DapBreakpoint", linehl = "", numhl = "" })
