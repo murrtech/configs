@@ -103,6 +103,7 @@ return {
   {
     "kyazdani42/nvim-web-devicons",
   },
+
   {
     "mfussenegger/nvim-dap",
     dependencies = {
@@ -110,11 +111,9 @@ return {
       "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
-      require "configs.dap"
       local dap = require "dap"
       local dapui = require "dapui"
 
-      -- Signs setup
       vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "DapBreakpoint", linehl = "", numhl = "" })
       vim.fn.sign_define(
         "DapBreakpointCondition",
@@ -123,40 +122,58 @@ return {
       vim.fn.sign_define("DapLogPoint", { text = "📝", texthl = "DapLogPoint", linehl = "", numhl = "" })
       vim.fn.sign_define("DapStopped", { text = "👉", texthl = "DapStopped", linehl = "DapStoppedLine", numhl = "" })
 
-      -- DAP UI setup
       dapui.setup {
-        icons = { expanded = "", collapsed = "", current_frame = "" },
-        mappings = {
-          expand = { "<CR>", "<2-LeftMouse>" },
-          open = "o",
-          remove = "d",
-          edit = "e",
-          repl = "r",
-          toggle = "t",
-        },
         layouts = {
           {
             elements = {
-              { id = "scopes", size = 0.33 },
-              { id = "breakpoints", size = 0.17 },
-              { id = "stacks", size = 0.25 },
-              { id = "watches", size = 0.25 },
+              { id = "repl", size = 1.0 },
             },
-            size = 0.33,
-            position = "right",
+            size = 0.25,
+            position = "bottom",
           },
           {
             elements = {
-              { id = "repl", size = 0.45 },
-              { id = "console", size = 0.55 },
+              { id = "scopes", size = 1.0 },
             },
-            size = 0.27,
-            position = "bottom",
+            size = 0.4,
+            position = "right",
+          },
+        },
+        icons = {
+          expanded = "▾",
+          collapsed = "▸",
+          current_frame = "→",
+          pause = "⏸️",
+          play = "▶️",
+          step_into = "⤵️",
+          step_over = "⏭️",
+          step_out = "⤴️",
+          step_back = "◀️",
+          run_last = "🔄",
+          terminate = "⏹️",
+          disconnect = "⭘",
+        },
+        render = {
+          max_type_length = 0,
+          max_value_lines = 1,
+          indent = 1,
+          variable_style = "minimal",
+          compact = true,
+        },
+        floating = {
+          border = "single",
+          mappings = {
+            close = { "q", "<Esc>" },
           },
         },
       }
 
-      -- Rust configuration
+      require("nvim-dap-virtual-text").setup {
+        enabled = true,
+        enabled_commands = true,
+        highlight_changed_variables = true,
+      }
+
       dap.adapters.codelldb = {
         type = "server",
         port = "${port}",
@@ -168,14 +185,7 @@ return {
 
       dap.configurations.rust = {
         {
-          name = "cargo build",
-          cargo = {
-            args = { "build" },
-            filter = {
-              name = "cargo build",
-              kind = "cargo-build",
-            },
-          },
+          name = "Launch",
           type = "codelldb",
           request = "launch",
           program = function()
@@ -183,93 +193,48 @@ return {
             local metadata = vim.fn.json_decode(output)
             local target_dir = metadata.target_directory
             local debug_dir = target_dir .. "/debug"
-
             local files = vim.fn.glob(debug_dir .. "/*", true, true)
             local executables = vim.tbl_filter(function(file)
               return vim.fn.executable(file) == 1 and not vim.fn.isdirectory(file)
             end, files)
-
-            local current_file = vim.fn.expand "%:p"
-            local cargo_toml = vim.fn.findfile("Cargo.toml", ".;")
-            local crate_name = nil
-
-            if cargo_toml ~= "" then
-              local content = vim.fn.readfile(cargo_toml)
-              for _, line in ipairs(content) do
-                if line:match '^name%s*=%s*"(.+)"' then
-                  crate_name = line:match '^name%s*=%s*"(.+)"'
-                  break
-                end
-              end
-            end
-
-            if crate_name then
-              for _, exe in ipairs(executables) do
-                if exe:match(crate_name .. "$") then
-                  return exe
-                end
-              end
-            end
-
-            return executables[1] or vim.fn.input("...Path to executable: ", debug_dir .. "/", "file")
+            return executables[1] or vim.fn.input("Path to executable: ", debug_dir .. "/", "file")
           end,
           cwd = "${workspaceFolder}",
           stopOnEntry = false,
-          args = {},
-          runInTerminal = false,
-          reverse = true,
         },
       }
-
-      -- UI handlers
       dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
-      end
-      dap.listeners.before.event_terminated["dapui_config"] = function()
-        dapui.close()
-      end
-      dap.listeners.before.event_exited["dapui_config"] = function()
-        dapui.close()
+        vim.opt.wrap = false
       end
 
-      -- Keymaps
-      vim.keymap.set("n", "<leader>dr", function()
-        dap.reverse_step()
-      end, { desc = "Debug: Reverse Step" })
-      vim.keymap.set("n", "<leader>dc", function()
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close()
+        vim.opt.wrap = true
+      end
+
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close()
+        vim.opt.wrap = true
+      end
+
+      vim.keymap.set("n", "<leader>d", function()
         dap.continue()
-      end, { desc = "Debug: Continue" })
-      vim.keymap.set("n", "<leader>di", function()
-        dap.step_into()
-      end, { desc = "Debug: Step Into" })
-      vim.keymap.set("n", "<leader>do", function()
-        dap.step_over()
-      end, { desc = "Debug: Step Over" })
-      vim.keymap.set("n", "<leader>dO", function()
-        dap.step_out()
-      end, { desc = "Debug: Step Out" })
+      end, { desc = "Debug: Start/Continue" })
       vim.keymap.set("n", "<leader>b", function()
         dap.toggle_breakpoint()
       end, { desc = "Debug: Toggle Breakpoint" })
-      vim.keymap.set("n", "<leader>dB", function()
-        dap.set_breakpoint(vim.fn.input "Breakpoint condition: ")
-      end, { desc = "Debug: Conditional Breakpoint" })
-      vim.keymap.set("n", "<leader>dr", function()
-        dap.reverse_continue()
-      end, { desc = "Debug: Reverse Continue" })
-      vim.keymap.set("n", "<leader>dR", function()
-        dap.reverse_step()
-      end, { desc = "Debug: Reverse Step" })
-      vim.keymap.set("n", "<leader>d", function()
-        dap.continue()
-      end, { desc = "Debug: Start/Launch" })
-      vim.keymap.set("n", "<leader>dx", function()
-        dap.terminate()
-        dapui.close()
-      end, { desc = "Debug: Stop and Close" })
+      vim.keymap.set("n", "<leader>do", function()
+        dap.step_over()
+      end, { desc = "Debug: Step Over" })
+      vim.keymap.set("n", "<leader>di", function()
+        dap.step_into()
+      end, { desc = "Debug: Step Into" })
+      vim.keymap.set("n", "K", function()
+        require("dap.ui.widgets").hover()
+      end, { desc = "Debug: Hover Value" })
     end,
   },
-
   {
     "nvim-telescope/telescope.nvim",
     opts = function()
@@ -280,7 +245,7 @@ return {
             vertical = {
               height = 0.99,
               preview_cutoff = 0,
-              prompt_position = "top",
+              prompt_position = "bottom",
               width = 0.9,
             },
           },
@@ -290,6 +255,11 @@ return {
             "build/.*",
             "target/.*",
             ".*%.lock",
+          },
+          mappings = {
+            i = {
+              ["<CR>"] = "select_default_no_preview",
+            },
           },
         },
       }
