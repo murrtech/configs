@@ -33,13 +33,13 @@ return {
         "html-lsp",
         "css-lsp",
         "prettier",
-
         "emmet-ls",
         "json-lsp",
         "shfmt",
         "shellcheck",
         "rust-analyzer",
         "codelldb",
+        "cpptools",
       },
     },
   },
@@ -110,6 +110,7 @@ return {
       "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
+      require "configs.dap"
       local dap = require "dap"
       local dapui = require "dapui"
 
@@ -210,8 +211,7 @@ return {
               end
             end
 
-            return executables[1]
-              or vim.fn.input("No executables found. Path to executable: ", debug_dir .. "/", "file")
+            return executables[1] or vim.fn.input("...Path to executable: ", debug_dir .. "/", "file")
           end,
           cwd = "${workspaceFolder}",
           stopOnEntry = false,
