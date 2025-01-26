@@ -110,9 +110,10 @@ return {
       "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
-      require "configs.dap" -- Add this line
       local dap = require "dap"
+      local dapui = require "dapui"
 
+      -- Signs setup
       vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "DapBreakpoint", linehl = "", numhl = "" })
       vim.fn.sign_define(
         "DapBreakpointCondition",
@@ -120,13 +121,11 @@ return {
       )
       vim.fn.sign_define("DapLogPoint", { text = "📝", texthl = "DapLogPoint", linehl = "", numhl = "" })
       vim.fn.sign_define("DapStopped", { text = "👉", texthl = "DapStopped", linehl = "DapStoppedLine", numhl = "" })
-      local dapui = require "dapui"
 
       -- DAP UI setup
       dapui.setup {
         icons = { expanded = "", collapsed = "", current_frame = "" },
         mappings = {
-          -- Use a table to apply multiple mappings
           expand = { "<CR>", "<2-LeftMouse>" },
           open = "o",
           remove = "d",
@@ -156,7 +155,73 @@ return {
         },
       }
 
-      -- Automatically open UI
+      -- Rust configuration
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = vim.fn.stdpath "data" .. "/mason/packages/codelldb/extension/adapter/codelldb",
+          args = { "--port", "${port}" },
+        },
+      }
+
+      dap.configurations.rust = {
+        {
+          name = "cargo build",
+          cargo = {
+            args = { "build" },
+            filter = {
+              name = "cargo build",
+              kind = "cargo-build",
+            },
+          },
+          type = "codelldb",
+          request = "launch",
+          program = function()
+            local output = vim.fn.system "cargo metadata --format-version 1 --no-deps"
+            local metadata = vim.fn.json_decode(output)
+            local target_dir = metadata.target_directory
+            local debug_dir = target_dir .. "/debug"
+
+            local files = vim.fn.glob(debug_dir .. "/*", true, true)
+            local executables = vim.tbl_filter(function(file)
+              return vim.fn.executable(file) == 1 and not vim.fn.isdirectory(file)
+            end, files)
+
+            local current_file = vim.fn.expand "%:p"
+            local cargo_toml = vim.fn.findfile("Cargo.toml", ".;")
+            local crate_name = nil
+
+            if cargo_toml ~= "" then
+              local content = vim.fn.readfile(cargo_toml)
+              for _, line in ipairs(content) do
+                if line:match '^name%s*=%s*"(.+)"' then
+                  crate_name = line:match '^name%s*=%s*"(.+)"'
+                  break
+                end
+              end
+            end
+
+            if crate_name then
+              for _, exe in ipairs(executables) do
+                if exe:match(crate_name .. "$") then
+                  return exe
+                end
+              end
+            end
+
+            return executables[1]
+              or vim.fn.input("No executables found. Path to executable: ", debug_dir .. "/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+          args = {},
+          runInTerminal = false,
+          reverse = true,
+        },
+      }
+
+      -- UI handlers
       dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
       end
@@ -167,6 +232,7 @@ return {
         dapui.close()
       end
 
+      -- Keymaps
       vim.keymap.set("n", "<leader>dr", function()
         dap.reverse_step()
       end, { desc = "Debug: Reverse Step" })
@@ -197,33 +263,13 @@ return {
       vim.keymap.set("n", "<leader>d", function()
         dap.continue()
       end, { desc = "Debug: Start/Launch" })
-
-      -- Configure language-specific debuggers
-      -- Example for Rust (requires codelldb)
-      dap.adapters.codelldb = {
-        type = "server",
-        port = "${port}",
-        executable = {
-          command = vim.fn.stdpath "data" .. "/mason/packages/codelldb/extension/adapter/codelldb",
-          args = { "--port", "${port}" },
-        },
-      }
-
-      dap.configurations.rust = {
-        {
-          name = "Launch file",
-          type = "codelldb",
-          request = "launch",
-          program = function()
-            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
-          end,
-          cwd = "${workspaceFolder}",
-          stopOnEntry = false,
-          reverse = true,
-        },
-      }
+      vim.keymap.set("n", "<leader>dx", function()
+        dap.terminate()
+        dapui.close()
+      end, { desc = "Debug: Stop and Close" })
     end,
   },
+
   {
     "nvim-telescope/telescope.nvim",
     opts = function()
