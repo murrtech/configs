@@ -101,10 +101,6 @@ return {
   },
 
   {
-    "kyazdani42/nvim-web-devicons",
-  },
-
-  {
     "mfussenegger/nvim-dap",
     dependencies = {
       "rcarriga/nvim-dap-ui",
@@ -126,14 +122,17 @@ return {
         layouts = {
           {
             elements = {
-              { id = "repl", size = 1.0 },
+              { id = "console", size = 1.0 },
             },
             size = 0.25,
             position = "bottom",
           },
           {
             elements = {
-              { id = "scopes", size = 1.0 },
+              { id = "scopes", size = 0.7 },
+              { id = "watches", size = 0.1 },
+              { id = "breakpoints", size = 0.1 },
+              { id = "repl", size = 0.1 },
             },
             size = 0.4,
             position = "right",
@@ -203,21 +202,39 @@ return {
           stopOnEntry = false,
         },
       }
+
+      -- Listeners
       dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
         vim.opt.wrap = false
       end
 
+      -- Create a flag for terminated/exited state
+      local session_ended = false
+
       dap.listeners.before.event_terminated["dapui_config"] = function()
-        dapui.close()
         vim.opt.wrap = true
+        session_ended = true
+        vim.cmd [[
+        augroup DapUICloseOnKey
+          autocmd!
+          autocmd InsertEnter,CursorMoved * ++once lua require('dapui').close() vim.opt.wrap = true
+        augroup END
+      ]]
       end
 
       dap.listeners.before.event_exited["dapui_config"] = function()
-        dapui.close()
         vim.opt.wrap = true
+        session_ended = true
+        vim.cmd [[
+        augroup DapUICloseOnKey
+          autocmd!
+          autocmd InsertEnter,CursorMoved * ++once lua require('dapui').close() vim.opt.wrap = true
+        augroup END
+      ]]
       end
 
+      -- Keymaps
       vim.keymap.set("n", "<leader>d", function()
         dap.continue()
       end, { desc = "Debug: Start/Continue" })
@@ -233,7 +250,14 @@ return {
       vim.keymap.set("n", "K", function()
         require("dap.ui.widgets").hover()
       end, { desc = "Debug: Hover Value" })
+      vim.keymap.set("n", "<leader>du", function()
+        dapui.close()
+      end, { desc = "Debug: Close UI" })
     end,
+  },
+
+  {
+    "kyazdani42/nvim-web-devicons",
   },
   {
     "nvim-telescope/telescope.nvim",
