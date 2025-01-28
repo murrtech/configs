@@ -105,11 +105,14 @@ return {
     dependencies = {
       "rcarriga/nvim-dap-ui",
       "theHamsta/nvim-dap-virtual-text",
+      -- Potential extra plugin to keep breakpoints across sessions
+      -- "Weissle/persistent-breakpoints.nvim",
     },
     config = function()
       local dap = require "dap"
       local dapui = require "dapui"
 
+      -- Existing configurations ...
       vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "DapBreakpoint", linehl = "", numhl = "" })
       vim.fn.sign_define(
         "DapBreakpointCondition",
@@ -203,13 +206,12 @@ return {
         },
       }
 
-      -- Listeners
+      -- Open UI when session starts, close with Insert or CursorMove after termination
       dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
         vim.opt.wrap = false
       end
 
-      -- Create a flag for terminated/exited state
       local session_ended = false
 
       dap.listeners.before.event_terminated["dapui_config"] = function()
@@ -234,7 +236,7 @@ return {
       ]]
       end
 
-      -- Keymaps
+      -- Keymaps for controlling debugging sessions
       vim.keymap.set("n", "<leader>d", function()
         dap.continue()
       end, { desc = "Debug: Start/Continue" })
@@ -247,9 +249,27 @@ return {
       vim.keymap.set("n", "<leader>di", function()
         dap.step_into()
       end, { desc = "Debug: Step Into" })
+
+      -- Additional helpful keymaps
+      vim.keymap.set("n", "<leader>dO", function()
+        dap.step_out()
+      end, { desc = "Debug: Step Out" })
+      vim.keymap.set("n", "<leader>dC", function()
+        dap.set_breakpoint(vim.fn.input "Condition: ")
+      end, { desc = "Debug: Conditional Breakpoint" })
+      vim.keymap.set("n", "<leader>dL", function()
+        dap.set_breakpoint(nil, nil, vim.fn.input "Log: ")
+      end, { desc = "Debug: Log Point" })
+      vim.keymap.set("n", "<leader>dr", function()
+        dap.repl.toggle({}, "vsplit")
+      end, { desc = "Debug: Toggle REPL" })
+
+      -- Hover to inspect variables
       vim.keymap.set("n", "K", function()
         require("dap.ui.widgets").hover()
       end, { desc = "Debug: Hover Value" })
+
+      -- Close UI manually
       vim.keymap.set("n", "<leader>du", function()
         dapui.close()
       end, { desc = "Debug: Close UI" })

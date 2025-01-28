@@ -6,6 +6,7 @@ highlight PmenuSbar guibg=#313244
 highlight PmenuThumb guibg=#585b70
 
 " Edit
+anoremenu PopUp.⌨️\ Go\ Back <cmd>b#<CR>
 anoremenu PopUp.⌨️\ Cut "+x
 anoremenu PopUp.⌨️\ Copy "+y
 anoremenu PopUp.⌨️\ Paste "+gP
@@ -13,10 +14,10 @@ anoremenu PopUp.⌨️\ Select\ All ggVG
 anoremenu PopUp.-Sep1- :
 
 " Debug
-anoremenu PopUp.⚡\ Continue/Start <cmd>lua require'dap'.continue()<CR>
-anoremenu PopUp.⚡\ Terminate <cmd>lua require'dap'.terminate()<CR>
 anoremenu PopUp.⚡\ Toggle\ Breakpoint <cmd>lua require'dap'.toggle_breakpoint()<CR>
 anoremenu PopUp.⚡\ Conditional\ Breakpoint <cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+anoremenu PopUp.⚡\ Continue/Start <cmd>lua require'dap'.continue()<CR>
+anoremenu PopUp.⚡\ Terminate <cmd>lua require'dap'.terminate()<CR>
 anoremenu PopUp.⚡\ Logpoint <cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log message: '))<CR>
 anoremenu PopUp.⚡\ Step\ Over <cmd>lua require'dap'.step_over()<CR>
 anoremenu PopUp.⚡\ Step\ Into <cmd>lua require'dap'.step_into()<CR>
