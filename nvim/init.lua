@@ -31,7 +31,7 @@ dofile(vim.g.base46_cache .. "statusline")
 
 require "options"
 require "nvchad.autocmds"
-require "configs.dap"
+require "configs.mouse_menu"
 
 vim.schedule(function()
   require "mappings"

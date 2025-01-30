@@ -27,7 +27,7 @@ local severity_to_name = {
 }
 
 -- 3) Configure nvim diagnostic output
-vim.o.updatetime = 100
+vim.o.updatetime = 200
 
 vim.diagnostic.config {
   virtual_text = false,

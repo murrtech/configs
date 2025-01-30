@@ -6,18 +6,17 @@
 local M = {}
 
 M.base46 = {
-	theme = "github_dark",
-	theme_toggle = { "github_dark", "gruvbox" },
-	transparency = false,
+  theme = "github_dark",
+  theme_toggle = { "github_dark", "gruvbox" },
+  transparency = false,
 
-	hl_override = {
-		Comment = { italic = true },
-		["@comment"] = { italic = true },
-	},
+  hl_override = {
+    Comment = { italic = true },
+    ["@comment"] = { italic = true },
+  },
 }
 M.nvdash = {
-	load_on_startup = true,
+  load_on_startup = true,
 }
-
 
 return M

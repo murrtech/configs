@@ -42,9 +42,4 @@ anoremenu PopUp.-Sep4- :
 
 " Terminal
 anoremenu PopUp.🖥️\ Sync\ Nvim <cmd>!s_nvim<CR><cmd>qa!<CR>
-anoremenu PopUp.-Sep5- :
-
-" Visual mode
-vnoremenu PopUp.⚡\ Evaluate <cmd>lua require'dap.ui.widgets'.preview()<CR>
-vnoremenu PopUp.🔍\ Format\ Selection <cmd>lua vim.lsp.buf.format({ async = true })<CR>
 ]]
