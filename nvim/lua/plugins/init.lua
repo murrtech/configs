@@ -1,5 +1,6 @@
 return {
-  { require "plugins.dap" },
+  --{ require "plugins.nvim_dap" },
+  { require "plugins.nvim_dap_rr" },
   { require "plugins.rustaceanvim" },
   { require "plugins.nvim_dap_ui" },
   { require "plugins.conform" },
