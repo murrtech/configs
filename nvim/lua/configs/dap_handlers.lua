@@ -1,32 +1,40 @@
+-- in lua/configs/dap_handlers.lua
 local M = {}
 
 M.continue = function()
-  local dap = require "dap"
-  if dap.session() and dap.session().stopped_thread_id then
-    dap.continue()
-  else
-    dap.pause()
-  end
+  vim.schedule(function()
+    require("dap").continue()
+  end)
 end
 
 M.terminate = function()
-  require("dap").terminate()
+  vim.schedule(function()
+    require("dap").terminate()
+  end)
 end
 
 M.step_over = function()
-  require("dap").step_over()
+  vim.schedule(function()
+    require("dap").step_over()
+  end)
 end
 
 M.step_into = function()
-  require("dap").step_into()
+  vim.schedule(function()
+    require("dap").step_into()
+  end)
 end
 
 M.step_out = function()
-  require("dap").step_out()
+  vim.schedule(function()
+    require("dap").step_out()
+  end)
 end
 
 M.toggle_breakpoint = function()
-  require("dap").toggle_breakpoint()
+  vim.schedule(function()
+    require("dap").toggle_breakpoint()
+  end)
 end
 
 return M
