@@ -1,53 +1,46 @@
 ---@type ChadrcConfig
 local M = {}
-
 M.base46 = {
   theme = "github_dark",
   theme_toggle = { "github_dark", "gruvbox" },
   transparency = false,
 }
-
 M.nvdash = {
   load_on_startup = true,
 }
-
 M.ui = {
   statusline = {
-    theme = "default",
+    theme = "vscode_colored",
     separator_style = "default",
-    order = { "mode", "file", "dap_icons", "%=", "lsp_msg", "%=", "lsp", "cwd" },
+    order = { "mode", "file", "%=", "lsp_msg", "%=", "lsp" },
+  },
+  tabufline = {
+    order = { "treeOffset", "buffers", "tabs", "debug_icons" },
     modules = {
-      dap_icons = function()
+      debug_icons = function()
         local ok, dap = pcall(require, "dap")
         if not ok then
-          return "%#St_dapInactive#󰐊  󰓛  ➜  󰆹  󰆸  󰳲 "
+          return "%#St_dapInactive#󰐊 󰓛 ➜ 󰆹 󰆸 󰳲"
         end
 
         local status = ""
         if dap.session() then
           status = table.concat {
-            "%#DapPlayButton#",
-            "%@v:lua.require'configs.dap_handlers'.continue@ 󰐊 %X", -- Play (green)
-            "%#DapStopButton#",
-            "%@v:lua.require'configs.dap_handlers'.terminate@ 󰓛 %X", -- Stop (red)
-            "%#DapStepButton#",
-            "%@v:lua.require'configs.dap_handlers'.step_over@ ➜ %X", -- Step over (blue)
-            "%#DapStepButton#",
-            "%@v:lua.require'configs.dap_handlers'.step_into@ 󰆹 %X", -- Step into (blue)
-            "%#DapStepButton#",
-            "%@v:lua.require'configs.dap_handlers'.step_out@ 󰆸 %X", -- Step out (blue)
-            "%#DapBreakpointButton#",
-            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@ 󰳲 %X", -- Breakpoint (red)
+            "%@v:lua.require'configs.dap_handlers'.continue@%#DapPlayButton# 󰐊 %X", -- Play (green)
+            "%@v:lua.require'configs.dap_handlers'.terminate@%#DapStopButton# 󰓛 %X", -- Stop (red)
+            "%@v:lua.require'configs.dap_handlers'.step_over@%#DapStepButton# ➜ %X", -- Step over (blue)
+            "%@v:lua.require'configs.dap_handlers'.step_into@%#DapStepButton# 󰆹 %X", -- Step into (blue)
+            "%@v:lua.require'configs.dap_handlers'.step_out@%#DapStepButton# 󰆸 %X", -- Step out (blue)
+            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@%#DapBreakpointButton# 󰳲 %X", -- Breakpoint (red)
           }
         else
           status = table.concat {
-            "%#St_dapInactive#",
-            "%@v:lua.require'configs.dap_handlers'.continue@ 󰐊 %X",
-            "%@v:lua.require'configs.dap_handlers'.terminate@ 󰓛 %X",
-            "%@v:lua.require'configs.dap_handlers'.step_over@ ➜ %X",
-            "%@v:lua.require'configs.dap_handlers'.step_into@ 󰆹 %X",
-            "%@v:lua.require'configs.dap_handlers'.step_out@ 󰆸 %X",
-            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@ 󰳲 %X",
+            "%@v:lua.require'configs.dap_handlers'.continue@%#St_dapInactive# 󰐊 %X",
+            "%@v:lua.require'configs.dap_handlers'.terminate@%#St_dapInactive# 󰓛 %X",
+            "%@v:lua.require'configs.dap_handlers'.step_over@%#St_dapInactive# ➜ %X",
+            "%@v:lua.require'configs.dap_handlers'.step_into@%#St_dapInactive# 󰆹 %X",
+            "%@v:lua.require'configs.dap_handlers'.step_out@%#St_dapInactive# 󰆸 %X",
+            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@%#St_dapInactive# 󰳲 %X",
           }
         end
         return status
@@ -56,19 +49,37 @@ M.ui = {
   },
 }
 
--- Initialize DAP listeners and keymaps
+-- Function to set custom DAP highlight groups
+local function set_dap_highlights()
+  vim.api.nvim_set_hl(0, "DapPlayButton", { fg = "#00ff00", bold = true }) -- Bright green for play/continue
+  vim.api.nvim_set_hl(0, "DapStopButton", { fg = "#ff4040", bold = true }) -- Bright red for stop
+  vim.api.nvim_set_hl(0, "DapStepButton", { fg = "#00bfff", bold = true }) -- Deep sky blue for stepping
+  vim.api.nvim_set_hl(0, "DapBreakpointButton", { fg = "#ff3333", bold = true }) -- Strong red for breakpoints
+  vim.api.nvim_set_hl(0, "St_dapInactive", { fg = "#666666" }) -- Dark gray for inactive
+end
+
+-- Initialize DAP listeners, keymaps, and highlight groups
 local init = function()
   local ok, dap = pcall(require, "dap")
   if ok then
-    local function refresh_statusline()
-      vim.cmd "redrawstatus"
+    -- Apply the highlight groups immediately
+    set_dap_highlights()
+
+    -- Ensure highlights are re-applied on colorscheme change
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      pattern = "*",
+      callback = set_dap_highlights,
+    })
+
+    local function refresh_tabline()
+      vim.cmd "redrawtabline"
     end
 
-    dap.listeners.after.event_initialized["statusline_refresh"] = refresh_statusline
-    dap.listeners.after.event_continued["statusline_refresh"] = refresh_statusline
-    dap.listeners.after.event_terminated["statusline_refresh"] = refresh_statusline
-    dap.listeners.after.event_exited["statusline_refresh"] = refresh_statusline
-    dap.listeners.after.event_stopped["statusline_refresh"] = refresh_statusline
+    dap.listeners.after.event_initialized["tabline_refresh"] = refresh_tabline
+    dap.listeners.after.event_continued["tabline_refresh"] = refresh_tabline
+    dap.listeners.after.event_terminated["tabline_refresh"] = refresh_tabline
+    dap.listeners.after.event_exited["tabline_refresh"] = refresh_tabline
+    dap.listeners.after.event_stopped["tabline_refresh"] = refresh_tabline
   end
 end
 
