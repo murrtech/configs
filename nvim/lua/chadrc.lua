@@ -1,37 +1,47 @@
 ---@type ChadrcConfig
 local M = {}
+
+-- Define the command early so that the clickable area in the statusline works:
+vim.cmd [[command! NvimTreeToggle lua require("nvim-tree").toggle()]]
+
 M.base46 = {
   theme = "github_dark",
   theme_toggle = { "github_dark", "gruvbox" },
   transparency = false,
 }
+
 M.nvdash = {
   load_on_startup = true,
 }
+
 M.ui = {
+
   statusline = {
     theme = "vscode_colored",
     separator_style = "default",
     order = { "mode", "file", "%=", "lsp_msg", "%=", "lsp" },
   },
   tabufline = {
-    order = { "treeOffset", "buffers", "tabs", "debug_icons" },
+    order = { "nvim_tree_toggle", "treeOffset", "buffers", "debug_icons", "tabs", "btns" },
     modules = {
+      nvim_tree_toggle = function()
+        return "%@NvimTreeToggle<cr>@%#NvimTreeToggleIcon# %X"
+      end,
       debug_icons = function()
         local ok, dap = pcall(require, "dap")
         if not ok then
-          return "%#St_dapInactive#󰐊 󰓛 ➜ 󰆹 󰆸 󰳲"
+          return "%#St_dapInactive#󰐊 󰓛 ➜ 󰆹 󰆸 󰳲  "
         end
 
         local status = ""
         if dap.session() then
           status = table.concat {
-            "%@v:lua.require'configs.dap_handlers'.continue@%#DapPlayButton# 󰐊 %X", -- Play (green)
-            "%@v:lua.require'configs.dap_handlers'.terminate@%#DapStopButton# 󰓛 %X", -- Stop (red)
-            "%@v:lua.require'configs.dap_handlers'.step_over@%#DapStepButton# ➜ %X", -- Step over (blue)
-            "%@v:lua.require'configs.dap_handlers'.step_into@%#DapStepButton# 󰆹 %X", -- Step into (blue)
-            "%@v:lua.require'configs.dap_handlers'.step_out@%#DapStepButton# 󰆸 %X", -- Step out (blue)
-            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@%#DapBreakpointButton# 󰳲 %X", -- Breakpoint (red)
+            "%@v:lua.require'configs.dap_handlers'.continue@%#DapPlayButton# 󰐊 %X",
+            "%@v:lua.require'configs.dap_handlers'.terminate@%#DapStopButton# 󰓛 %X",
+            "%@v:lua.require'configs.dap_handlers'.step_over@%#DapStepButton# ➜ %X",
+            "%@v:lua.require'configs.dap_handlers'.step_into@%#DapStepButton# 󰆹 %X",
+            "%@v:lua.require'configs.dap_handlers'.step_out@%#DapStepButton# 󰆸 %X",
+            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@%#DapBreakpointButton# 󰳲  %X",
           }
         else
           status = table.concat {
@@ -40,7 +50,7 @@ M.ui = {
             "%@v:lua.require'configs.dap_handlers'.step_over@%#St_dapInactive# ➜ %X",
             "%@v:lua.require'configs.dap_handlers'.step_into@%#St_dapInactive# 󰆹 %X",
             "%@v:lua.require'configs.dap_handlers'.step_out@%#St_dapInactive# 󰆸 %X",
-            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@%#St_dapInactive# 󰳲 %X",
+            "%@v:lua.require'configs.dap_handlers'.toggle_breakpoint@%#St_dapInactive# 󰳲  %X",
           }
         end
         return status
@@ -49,37 +59,39 @@ M.ui = {
   },
 }
 
--- Function to set custom DAP highlight groups
 local function set_dap_highlights()
-  vim.api.nvim_set_hl(0, "DapPlayButton", { fg = "#00ff00", bold = true }) -- Bright green for play/continue
-  vim.api.nvim_set_hl(0, "DapStopButton", { fg = "#ff4040", bold = true }) -- Bright red for stop
-  vim.api.nvim_set_hl(0, "DapStepButton", { fg = "#00bfff", bold = true }) -- Deep sky blue for stepping
-  vim.api.nvim_set_hl(0, "DapBreakpointButton", { fg = "#ff3333", bold = true }) -- Strong red for breakpoints
-  vim.api.nvim_set_hl(0, "St_dapInactive", { fg = "#666666" }) -- Dark gray for inactive
+  -- Active DAP icons with theme-compatible colors
+  vim.api.nvim_set_hl(0, "DapPlayButton", { fg = "#98c379", bold = true }) -- Green
+  vim.api.nvim_set_hl(0, "DapStopButton", { fg = "#e06c75", bold = true }) -- Red
+  vim.api.nvim_set_hl(0, "DapStepButton", { fg = "#61afef", bold = true }) -- Blue
+  vim.api.nvim_set_hl(0, "DapBreakpointButton", { fg = "#e06c75", bold = true }) -- Red
+
+  -- Inactive state using theme's comment color
+  vim.api.nvim_set_hl(0, "St_dapInactive", { fg = vim.g.base46.colors.comment })
+
+  -- NvimTree toggle icon using folder color from theme
+  vim.api.nvim_set_hl(0, "NvimTreeToggleIcon", { fg = vim.g.base46.colors.blue })
 end
 
--- Initialize DAP listeners, keymaps, and highlight groups
-local init = function()
+local function init()
   local ok, dap = pcall(require, "dap")
   if ok then
-    -- Apply the highlight groups immediately
     set_dap_highlights()
 
-    -- Ensure highlights are re-applied on colorscheme change
     vim.api.nvim_create_autocmd("ColorScheme", {
       pattern = "*",
-      callback = set_dap_highlights,
+      callback = function()
+        set_dap_highlights()
+        vim.cmd "redrawtabline"
+      end,
     })
 
-    local function refresh_tabline()
+    local refresh_tabline = function()
       vim.cmd "redrawtabline"
     end
-
-    dap.listeners.after.event_initialized["tabline_refresh"] = refresh_tabline
-    dap.listeners.after.event_continued["tabline_refresh"] = refresh_tabline
-    dap.listeners.after.event_terminated["tabline_refresh"] = refresh_tabline
-    dap.listeners.after.event_exited["tabline_refresh"] = refresh_tabline
-    dap.listeners.after.event_stopped["tabline_refresh"] = refresh_tabline
+    for _, event in ipairs { "event_initialized", "event_continued", "event_terminated", "event_exited", "event_stopped" } do
+      dap.listeners.after[event]["tabline_refresh"] = refresh_tabline
+    end
   end
 end
 
