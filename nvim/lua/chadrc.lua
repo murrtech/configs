@@ -18,15 +18,11 @@ M.ui = {
 
   statusline = {
     theme = "vscode_colored",
-    separator_style = "default",
-    order = { "mode", "file", "%=", "lsp_msg", "%=", "lsp" },
   },
   tabufline = {
-    order = { "nvim_tree_toggle", "treeOffset", "buffers", "debug_icons", "tabs", "btns" },
+    order = { "treeOffset", "buffers", "debug_icons", "btns" },
     modules = {
-      nvim_tree_toggle = function()
-        return "%@NvimTreeToggle<cr>@%#NvimTreeToggleIcon# %X"
-      end,
+
       debug_icons = function()
         local ok, dap = pcall(require, "dap")
         if not ok then
@@ -68,9 +64,6 @@ local function set_dap_highlights()
 
   -- Inactive state using theme's comment color
   vim.api.nvim_set_hl(0, "St_dapInactive", { fg = vim.g.base46.colors.comment })
-
-  -- NvimTree toggle icon using folder color from theme
-  vim.api.nvim_set_hl(0, "NvimTreeToggleIcon", { fg = vim.g.base46.colors.blue })
 end
 
 local function init()
