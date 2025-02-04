@@ -191,7 +191,11 @@ sudo pacman -S --noconfirm github-cli
 
 # <NEWSBOAT>
 sudo pacman -S --noconfirm newsboat
-# </ CLI>
+# </ NEWSBOAT>
+
+# <LAZYDOCKER>
+sudo pacman -S --noconfirm lazydocker
+# </ LAZYDOCKERT>
 
 
 # <GITUI>

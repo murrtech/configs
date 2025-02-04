@@ -9,16 +9,14 @@ require("nvchad.configs.lspconfig").defaults()
 local lspconfig = require "lspconfig"
 local nvlsp = require "nvchad.configs.lspconfig"
 
--- 1) Define signs for each diagnostic severity first
---    so we can reference them in the virtual_text.format function.
+
 local signs = {
-  Error = "", -- or "✗"
+  Error = "", 
   Warn = "",
-  Hint = "", -- lightbulb
+  Hint = "", 
   Info = "",
 }
 
--- 2) Map numeric diagnostic severities to our sign keys
 local severity_to_name = {
   [vim.diagnostic.severity.ERROR] = "Error",
   [vim.diagnostic.severity.WARN] = "Warn",
@@ -26,7 +24,6 @@ local severity_to_name = {
   [vim.diagnostic.severity.INFO] = "Info",
 }
 
--- 3) Configure nvim diagnostic output
 vim.o.updatetime = 200
 
 vim.diagnostic.config {
