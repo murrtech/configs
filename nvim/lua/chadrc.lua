@@ -1,24 +1,14 @@
--- chadrc.lua
--- Place this in your NVChad config (usually ~/.config/nvim/lua/custom/chadrc.lua)
---
--- If your entire bufferline is disappearing, it’s often because the default modules were removed
--- from the `order`. NVChad's tabufline has several built-in modules: "treeOffset", "buffers",
--- "tabs", "btns", etc. If you don't include them in the order, they won't display.
---
--- Below, we preserve the default modules AND add our new "debugModule" at the end.
--- This ensures the normal bufferline (buffers, tabs, close buttons) still appears.
-
+---@type ChadrcConfig
 local M = {}
 
 --------------------------------------------------------------------------------
--- 1. GLOBAL STATE
+-- 1. UI OVERRIDES
 --------------------------------------------------------------------------------
+
+-- We'll keep the debug module as is, only ensuring it doesn't break <leader>b.
 _G.project_name = "NoProject"
 _G.debug_active = false
 
---------------------------------------------------------------------------------
--- 2. LANGUAGE ICONS (You can expand this to fit your needs)
---------------------------------------------------------------------------------
 local lang_icons = {
   rust = "",
   lua = "",
@@ -26,12 +16,9 @@ local lang_icons = {
   go = "",
   javascript = "",
   typescript = "",
-  default = "",
+  default = "",
 }
 
---------------------------------------------------------------------------------
--- 3. PARSE CARGO PROJECT NAMES (Same logic as before)
---------------------------------------------------------------------------------
 local function find_nearest_cargo_toml(buf_path)
   if buf_path == "" then
     buf_path = vim.fn.expand "%:p"
@@ -48,7 +35,6 @@ local function find_nearest_cargo_toml(buf_path)
     end
   end
 
-  -- Fallback for older Neovim
   local sep = package.config:sub(1, 1)
   local function dirname(path)
     return path:match("(.*" .. sep .. ").-$") or path
@@ -72,7 +58,6 @@ local function parse_crate_name_from_cargo_toml(toml_path)
   if not toml_path then
     return "NoProject"
   end
-
   local file = io.open(toml_path, "r")
   if not file then
     return "NoProject"
@@ -103,6 +88,7 @@ local function update_project_name_for_buffer()
   if _G.debug_active then
     return
   end
+
   local buf_path = vim.api.nvim_buf_get_name(0)
   if buf_path == "" then
     buf_path = vim.fn.expand "%:p"
@@ -112,9 +98,6 @@ local function update_project_name_for_buffer()
   _G.project_name = crate_name
 end
 
---------------------------------------------------------------------------------
--- 4. AUTO COMMANDS (Update project name, if not debugging)
---------------------------------------------------------------------------------
 vim.api.nvim_create_autocmd({
   "BufEnter",
   "BufWinEnter",
@@ -128,77 +111,106 @@ vim.api.nvim_create_autocmd({
   end,
 })
 
---------------------------------------------------------------------------------
--- 5. DAP SETUP: LOGIC TO AVOID BAD STATE IF NO CONFIG SELECTED
---------------------------------------------------------------------------------
-
 local dap = require "dap"
 
+local continue_icon = ""
 local step_over_icon = ""
 local step_in_icon = ""
 local step_out_icon = ""
 local stop_icon = ""
+local restart_icon = ""
 
 _G.my_dap_start = function()
   _G.debug_active = true
   local prev_session = dap.session()
   dap.continue()
 
-  -- Check after a short delay if a session actually started
   vim.defer_fn(function()
     local current_session = dap.session()
     if not current_session or current_session == prev_session then
-      -- No debug session was chosen or started
       _G.debug_active = false
     end
   end, 250)
 end
 
+_G.my_dap_continue = function()
+  dap.continue()
+end
+
 _G.my_dap_step_over = function()
   dap.step_over()
 end
+
 _G.my_dap_step_in = function()
   dap.step_into()
 end
+
 _G.my_dap_step_out = function()
   dap.step_out()
 end
+
 _G.my_dap_stop = function()
   dap.terminate()
+end
+
+_G.my_dap_restart = function()
+  local session = dap.session()
+  if not session then
+    print "No debug session to restart!"
+    return
+  end
+  dap.terminate(nil, nil, function()
+    dap.run_last()
+  end)
 end
 
 dap.listeners.after.event_terminated["my_debug_listener"] = function()
   _G.debug_active = false
   update_project_name_for_buffer()
 end
-
 dap.listeners.after.event_exited["my_debug_listener"] = function()
   _G.debug_active = false
   update_project_name_for_buffer()
 end
 
---------------------------------------------------------------------------------
--- 6. VIEWS: DEFAULT VS. DEBUG
---------------------------------------------------------------------------------
 local function build_default_view()
   local ft = vim.bo.filetype or ""
   local lang_icon = lang_icons[ft] or lang_icons.default
   local crate_name = _G.project_name or "NoProject"
 
   return table.concat {
-    "%@v:lua.my_dap_start@", -- begin clickable region for "start debug"
+    "%@v:lua.my_dap_start@",
     "%#Identifier#",
-    "  ", -- play icon
+    " ",
+    continue_icon,
+    " ",
     lang_icon,
     " ",
     crate_name,
     " ",
-    "%X", -- end clickable region
+    "%X",
   }
 end
 
 local function build_debug_view()
-  local debug_controls = {
+  return table.concat {
+    -- Continue
+    "%@v:lua.my_dap_continue@",
+    "%#Identifier#",
+    " ",
+    continue_icon,
+    " ",
+    "%X",
+    " ",
+    -- Restart
+    "%@v:lua.my_dap_restart@",
+    "%#Identifier#",
+    " ",
+    restart_icon,
+    " ",
+    "%X",
+    " ",
+    -- Step Over
     "%@v:lua.my_dap_step_over@",
     "%#Identifier#",
     " ",
@@ -206,6 +218,7 @@ local function build_debug_view()
     " ",
     "%X",
     " ",
+    -- Step In
     "%@v:lua.my_dap_step_in@",
     "%#Identifier#",
     " ",
@@ -213,6 +226,7 @@ local function build_debug_view()
     " ",
     "%X",
     " ",
+    -- Step Out
     "%@v:lua.my_dap_step_out@",
     "%#Identifier#",
     " ",
@@ -220,33 +234,20 @@ local function build_debug_view()
     " ",
     "%X",
     " ",
+    -- Stop
     "%@v:lua.my_dap_stop@",
-    "%#Error#",
+    "%#Identifier#",
     " ",
     stop_icon,
     " ",
     "%X",
   }
-  return table.concat(debug_controls)
 end
 
---------------------------------------------------------------------------------
--- 7. NVCHAD TABUFLINE OVERRIDE
---    IMPORTANT: We preserve the existing modules: "treeOffset", "buffers", "tabs", "btns"
---    and THEN add "debugModule" last. That way, your bufferline is intact.
---------------------------------------------------------------------------------
 M.ui = {
   tabufline = {
     lazyload = false,
-    -- Keep default modules + inject our new "debugModule" at the end:
-    order = {
-      "treeOffset", -- show offset for nvim-tree if open
-      "buffers", -- display open buffers
-      "tabs", -- display tabs
-      "btns", -- default close/new buttons
-      "debugModule", -- our custom module
-    },
-
+    order = { "treeOffset", "buffers", "debugModule" },
     modules = {
       debugModule = function()
         if _G.debug_active then
@@ -257,11 +258,13 @@ M.ui = {
       end,
     },
   },
-
   statusline = {
-    theme = "default",
+    theme = "vscode_colored",
     separator_style = "default",
   },
+}
+M.nvdash = {
+  load_on_startup = true,
 }
 
 return M

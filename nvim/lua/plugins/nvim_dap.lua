@@ -1,4 +1,11 @@
--- nvim-dap configuration: integrates dap-ui and virtual text for a complete debugging experience
+-- Example snippet to ensure <leader>b (toggle breakpoint) and other dap mappings still work in NVChad.
+-- You can put these key mappings in one of these places:
+--   1) In your chadrc.lua M.mappings table
+--   2) In a separate config file that NVChad loads (e.g. custom/plugins/dap.lua)
+--
+-- This example uses "vim.keymap.set" directly. If you prefer the NVChad M.mappings style,
+-- see the bullet points below for an example of that approach.
+
 return {
   "mfussenegger/nvim-dap",
   dependencies = {
@@ -9,7 +16,6 @@ return {
     local dap = require "dap"
     local dapui = require "dapui"
 
-    -- Configure dap-ui layouts for console and side panels
     dapui.setup {
       layouts = {
         {
@@ -34,22 +40,25 @@ return {
       },
     }
 
-    -- Setup virtual text to display variable values inline
     require("nvim-dap-virtual-text").setup {
       enabled = true,
       enabled_commands = true,
       highlight_changed_variables = true,
     }
 
-    -- Define custom signs for breakpoints and debugging states
+    -- Custom signs
     vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "DapBreakpoint" })
     vim.fn.sign_define("DapBreakpointCondition", { text = "🟡", texthl = "DapBreakpointCondition" })
     vim.fn.sign_define("DapLogPoint", { text = "📝", texthl = "DapLogPoint" })
     vim.fn.sign_define("DapStopped", { text = "👉", texthl = "DapStopped", linehl = "DapStoppedLine" })
 
-    -- Set up additional key mappings for dap actions
+    --------------------------------------------------------------------------
+    -- Key Mappings for DAP
+    -- By default, NVChad sets <leader> to <Space>.
+    -- So <leader>b is <Space>b, <leader>d is <Space>d, etc.
+    --------------------------------------------------------------------------
     vim.keymap.set("n", "<leader>d", dap.continue, { desc = "DAP Start/Continue" })
-    vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint, { desc = "DAP Toggle Breakpoint" })
+    vim.keymap.set("n", "<leader>b", "<cmd> DapToggleBreakpoint <cr>", { desc = "DAP Toggle Breakpoint" })
     vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "DAP Step Over" })
     vim.keymap.set("n", "<leader>di", dap.step_into, { desc = "DAP Step Into" })
     vim.keymap.set("n", "<leader>dO", dap.step_out, { desc = "DAP Step Out" })
@@ -61,7 +70,7 @@ return {
       print "DAP session closed."
     end, { desc = "Close DAP Session and UI" })
 
-    -- Automatically open and close dap-ui with debugging events
+    -- Open/close dapui automatically
     dap.listeners.after.event_initialized["dapui_config"] = function()
       dapui.open()
     end
