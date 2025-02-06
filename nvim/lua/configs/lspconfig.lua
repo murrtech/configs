@@ -1,19 +1,12 @@
---------------------------------------------------------------------------------
--- Dynamically use each severity's sign icon as the inline prefix
--- and show no diagnostic message text. The hover float will still
--- display the full message on CursorHold/CursorHoldI events.
---------------------------------------------------------------------------------
-
 require("nvchad.configs.lspconfig").defaults()
 
 local lspconfig = require "lspconfig"
 local nvlsp = require "nvchad.configs.lspconfig"
 
-
 local signs = {
-  Error = "", 
+  Error = "",
   Warn = "",
-  Hint = "", 
+  Hint = "",
   Info = "",
 }
 

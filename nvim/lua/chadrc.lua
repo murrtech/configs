@@ -1,14 +1,23 @@
+-- chadrc.lua
+-- Place (or merge) this in your NVChad config at ~/.config/nvim/lua/custom/chadrc.lua
+--
+-- ENHANCEMENT:
+--   - Adds a new clickable button (folder icon) that toggles NvimTree.
+--   - This button is placed on the far right before the buffers, as requested.
+--   - Pressing the icon calls :NvimTreeToggle.
+
 ---@type ChadrcConfig
 local M = {}
 
 --------------------------------------------------------------------------------
--- 1. UI OVERRIDES
+-- 1. GLOBALS & DEBUG STATE
 --------------------------------------------------------------------------------
-
--- We'll keep the debug module as is, only ensuring it doesn't break <leader>b.
 _G.project_name = "NoProject"
 _G.debug_active = false
 
+--------------------------------------------------------------------------------
+-- 2. LANGUAGE ICONS
+--------------------------------------------------------------------------------
 local lang_icons = {
   rust = "",
   lua = "",
@@ -19,6 +28,9 @@ local lang_icons = {
   default = "",
 }
 
+--------------------------------------------------------------------------------
+-- 3. CARGO.TOML PARSING FOR PROJECT NAME (unchanged from prior)
+--------------------------------------------------------------------------------
 local function find_nearest_cargo_toml(buf_path)
   if buf_path == "" then
     buf_path = vim.fn.expand "%:p"
@@ -58,6 +70,7 @@ local function parse_crate_name_from_cargo_toml(toml_path)
   if not toml_path then
     return "NoProject"
   end
+
   local file = io.open(toml_path, "r")
   if not file then
     return "NoProject"
@@ -111,6 +124,9 @@ vim.api.nvim_create_autocmd({
   end,
 })
 
+--------------------------------------------------------------------------------
+-- 4. DAP LOGIC
+--------------------------------------------------------------------------------
 local dap = require "dap"
 
 local continue_icon = ""
@@ -173,6 +189,9 @@ dap.listeners.after.event_exited["my_debug_listener"] = function()
   update_project_name_for_buffer()
 end
 
+--------------------------------------------------------------------------------
+-- 5. BUILDING TABUFLINE VIEWS
+--------------------------------------------------------------------------------
 local function build_default_view()
   local ft = vim.bo.filetype or ""
   local lang_icon = lang_icons[ft] or lang_icons.default
@@ -244,11 +263,40 @@ local function build_debug_view()
   }
 end
 
+--------------------------------------------------------------------------------
+-- 6. TOGGLE NVIM TREE BUTTON
+--    - We'll place a new module, "toggleNvimTree", to the right side (before "buffers" or "debugModule")
+--    - Chosen icon: "" (Nerd Font for a folder-like icon). If it doesn't display, swap to another icon.
+--------------------------------------------------------------------------------
+_G.toggle_nvim_tree = function()
+  vim.cmd "NvimTreeToggle"
+end
+vim.api.nvim_set_hl(0, "TreeToggle", { fg = "#ffffff", bg = "#282c34", bold = true })
+
+-- 2. The function that builds your clickable tree toggle button with the new highlight.
+--    The entire region (icon + spacing + separator) is clickable and uses the "TreeToggle" highlight group.
+local function build_tree_toggle_button()
+  return table.concat {
+    "%@v:lua.toggle_nvim_tree@", -- begin clickable region
+    "%#TreeToggle#", -- our custom highlight group
+    "|   | ", -- icon + spacing + separator
+    "%X", -- end clickable region
+  }
+end -----------------------------------------------------------------------------
+-- 7. NVCHAD UI CONFIG
+--------------------------------------------------------------------------------
 M.ui = {
   tabufline = {
     lazyload = false,
-    order = { "treeOffset", "buffers", "debugModule" },
+    -- We insert "toggleNvimTree" module just before "buffers" in the order
+    order = { "treeOffset", "toggleNvimTree", "buffers", "debugModule" },
     modules = {
+      -- The new nvim-tree toggle module
+      toggleNvimTree = function()
+        return build_tree_toggle_button()
+      end,
+
+      -- The debug module we had previously
       debugModule = function()
         if _G.debug_active then
           return build_debug_view()
@@ -258,13 +306,33 @@ M.ui = {
       end,
     },
   },
+
   statusline = {
     theme = "vscode_colored",
     separator_style = "default",
   },
 }
+
+--------------------------------------------------------------------------------
+-- 8. NVDASH SETTINGS
+--------------------------------------------------------------------------------
 M.nvdash = {
   load_on_startup = true,
+}
+
+--------------------------------------------------------------------------------
+-- 9. MAPPINGS (OPTIONAL EXAMPLE)
+--    If you want to ensure <leader>b toggles breakpoints, add it here or in another file
+--------------------------------------------------------------------------------
+M.mappings = {
+  n = {
+    ["<leader>b"] = {
+      function()
+        require("dap").toggle_breakpoint()
+      end,
+      "Toggle DAP breakpoint",
+    },
+  },
 }
 
 return M
