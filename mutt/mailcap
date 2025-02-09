@@ -1,0 +1,11 @@
+# ~/.config/mutt/mailcap
+# Option 1: Render HTML in a text-based browser (no inline images)
+text/html; w3m -I 'UTF-8' -T text/html -o display_link_number=1 %s; \
+  nametemplate=%s.html; copiousoutput; description="HTML Text"
+
+# Option 2: Open HTML in a GUI browser for true inline images
+text/html; xdg-open %s; nametemplate=%s.html; description="Open in GUI Browser"
+
+image/*; feh %s
+application/pdf; zathura %s
+text/plain; cat %s; copiousoutput

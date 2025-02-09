@@ -1,0 +1,105 @@
+# ~/.config/mutt/muttrc
+
+# Account Settings
+set folder = "imaps://murraybenjamin1@gmail.com@imap.gmail.com:993"
+set spoolfile = "+INBOX"
+set imap_user = "murraybenjamin1@gmail.com"
+set imap_pass = `cat ~/.config/mutt/.password`
+set from = "murraybenjamin1@gmail.com"
+set realname = "Benjamin Murray"
+
+# Basic Settings
+set editor = 'vim'
+set timeout = 10
+set mail_check = 60
+set read_inc = 1000
+set message_cache_clean = yes
+set message_cachedir = "~/.config/mutt/cache/bodies"
+set header_cache = "~/.config/mutt/cache/headers"
+
+# Sorting and Threading
+set sort = 'reverse-date'
+set sort_aux = 'reverse-last-date-received'
+set sort_re = yes
+set thread_received = yes
+
+# Colors and Formatting
+color normal default default
+color hdrdefault cyan default
+color attachment yellow default
+color search black yellow
+color indicator brightyellow red
+color quoted green default
+color quoted1 cyan default
+color quoted2 yellow default
+color quoted3 red default
+color error red default
+color status black blue
+color tree brightmagenta default
+color tilde blue default
+color markers red default
+
+# Index Format
+set date_format="%y-%m-%d %T"
+set index_format="%4C %Z %{%b %d} %-15.15L (%4l) %s"
+
+# Enhanced HTML/Alternative Handling
+set mailcap_path = "~/.config/mutt/mailcap"
+alternative_order text/plain text/enriched text/html
+auto_view text/html text/enriched image/*   # Let Mutt automatically handle these
+set implicit_autoview=yes
+
+# Better HTML Handling
+set allow_ansi=yes
+set markers=no
+set smart_wrap=yes
+set wrap=120
+
+# Advanced HTML settings
+ignore *
+unignore from: subject to cc date x-mailer user-agent
+unignore x-spam-status x-spam-report
+unignore message-id
+hdr_order date from to cc subject
+
+# Force viewing HTML as text (with fallback order)
+alternative_order text/enriched text/plain text/html
+
+# Display Settings
+set pager_index_lines = 10
+set pager_context = 3
+set pager_stop = yes
+set menu_scroll = yes
+set tilde = yes
+set markers = no
+set wrap = 80
+set smart_wrap = yes
+
+# Better message formatting
+set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
+set pager_format = " %C - %[%H:%M] %.20v, %s%* %?H? [%H] ?"
+set pager_index_lines = 10
+set pager_stop = yes
+
+# Status bar format
+set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%>─%?p?( %p postponed )?───"
+
+# Sidebar Settings
+set sidebar_visible = yes
+set sidebar_width = 30
+set sidebar_format = "%B%*  %n"
+set sidebar_short_path = yes
+
+# Cache and Performance
+set imap_check_subscribed = yes
+set imap_keepalive = 300
+set mail_check = 60
+set timeout = 10
+
+# Hide extra conversion messages and improve viewing
+set pipe_decode
+set thorough_search
+set wait_key = no
+set sleep_time = 0
+ignore "Autoview using*"
+ignore "HTML*"

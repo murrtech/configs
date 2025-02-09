@@ -34,7 +34,7 @@ function fish_greeting
 
     echo # Empty line for spacing
     set_color yellow
-    echo "Sync Commands: s_[tmux|fish|nvim|gitui|alacritty|firefox|newsboat]"
+    echo "Sync Commands: s_[tmux|fish|nvim|gitui|alacritty|firefox|newsboat|mutt]"
     echo "Navigate To:   d_[config|compass]"
     echo
     set_color normal
@@ -159,6 +159,8 @@ alias ls='exa --tree --level=1 --only-dirs --icons'
 alias tmux=_tmux
 alias s_tmux="$HOME/Documents/compass/configs/arch/sync_tmux.sh"
 alias s_fish="$HOME/Documents/compass/configs/arch/sync_fish.sh"
+alias s_mutt="$HOME/Documents/compass/configs/arch/sync_mutt.sh"
+
 alias s_nvim="$HOME/Documents/compass/configs/arch/sync_nvim.sh"
 alias s_alacritty="$HOME/Documents/compass/configs/arch/sync_alacritty.sh"
 alias s_gitui="$HOME/Documents/compass/configs/arch/sync_gitui.sh"

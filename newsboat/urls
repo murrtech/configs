@@ -17,3 +17,42 @@ https://science.sciencemag.org/rss/express.xml "research" "science"             
 https://research.fb.com/feed/ "research" "meta"
 https://blog.research.google/feeds/posts/default "research" "google"
 https://deepmind.com/blog/feed/basic/ "research" "ai"
+
+# Tech News & Blogs
+https://news.ycombinator.com/rss "tech" "news"               # Hacker News
+https://lobste.rs/rss "tech" "news"                         # Lobsters
+https://lwn.net/headlines/rss "tech" "linux"                # Linux Weekly News
+https://feeds.feedburner.com/TheHackersNews "tech" "security" # The Hacker News
+
+# Programming & Development
+https://devblogs.microsoft.com/typescript/feed/ "dev" "typescript" # TypeScript Blog
+https://blog.rust-lang.org/feed.xml "dev" "rust"                  # Rust Blog
+https://blog.golang.org/feed.atom "dev" "golang"                  # Go Blog
+https://neovim.io/news.xml "dev" "neovim"                        # Neovim News
+
+# Tech Companies
+https://engineering.fb.com/feed/ "tech" "meta"              # Meta Engineering
+https://netflixtechblog.com/feed "tech" "netflix"          # Netflix Tech Blog
+https://blog.discord.com/feed "tech" "discord"              # Discord Blog
+https://aws.amazon.com/blogs/aws/feed/ "tech" "aws"        # AWS News
+
+# Security
+https://krebsonsecurity.com/feed/ "security" "news"         # Krebs on Security
+https://blog.malwarebytes.com/feed/ "security" "malware"    # Malwarebytes Blog
+https://nakedsecurity.sophos.com/feed "security" "news"     # Naked Security
+
+# Linux & Open Source
+https://itsfoss.com/feed/ "linux" "news"                    # It's FOSS
+https://www.phoronix.com/rss.php "linux" "news"            # Phoronix
+https://archlinux.org/feeds/news/ "linux" "arch"           # Arch Linux News
+
+# AI & ML News
+https://openai.com/blog/rss/ "ai" "news"                   # OpenAI Blog
+https://ai.googleblog.com/feeds/posts/default "ai" "google" # Google AI Blog
+https://blogs.nvidia.com/feed/ "ai" "nvidia"               # NVIDIA Blog
+
+# Reddit Feeds
+https://www.reddit.com/r/programming/.rss "reddit" "programming" # r/programming
+https://www.reddit.com/r/rust/.rss "reddit" "rust"             # r/rust
+https://www.reddit.com/r/neovim/.rss "reddit" "neovim"         # r/neovim
+https://www.reddit.com/r/archlinux/.rss "reddit" "arch"        # r/archlinux

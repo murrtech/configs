@@ -1,11 +1,3 @@
--- Example snippet to ensure <leader>b (toggle breakpoint) and other dap mappings still work in NVChad.
--- You can put these key mappings in one of these places:
---   1) In your chadrc.lua M.mappings table
---   2) In a separate config file that NVChad loads (e.g. custom/plugins/dap.lua)
---
--- This example uses "vim.keymap.set" directly. If you prefer the NVChad M.mappings style,
--- see the bullet points below for an example of that approach.
-
 return {
   "mfussenegger/nvim-dap",
   dependencies = {
@@ -16,6 +8,7 @@ return {
     local dap = require "dap"
     local dapui = require "dapui"
 
+    -- 1. Set up dap-ui
     dapui.setup {
       layouts = {
         {
@@ -40,23 +33,20 @@ return {
       },
     }
 
+    -- 2. Set up dap-virtual-text
     require("nvim-dap-virtual-text").setup {
       enabled = true,
       enabled_commands = true,
       highlight_changed_variables = true,
     }
 
-    -- Custom signs
+    -- 3. Custom signs in the gutter
     vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "DapBreakpoint" })
     vim.fn.sign_define("DapBreakpointCondition", { text = "🟡", texthl = "DapBreakpointCondition" })
     vim.fn.sign_define("DapLogPoint", { text = "📝", texthl = "DapLogPoint" })
     vim.fn.sign_define("DapStopped", { text = "👉", texthl = "DapStopped", linehl = "DapStoppedLine" })
 
-    --------------------------------------------------------------------------
-    -- Key Mappings for DAP
-    -- By default, NVChad sets <leader> to <Space>.
-    -- So <leader>b is <Space>b, <leader>d is <Space>d, etc.
-    --------------------------------------------------------------------------
+    -- 4. Key mappings for DAP (this uses vim.keymap directly, which is fine for most setups)
     vim.keymap.set("n", "<leader>d", dap.continue, { desc = "DAP Start/Continue" })
     vim.keymap.set("n", "<leader>b", "<cmd> DapToggleBreakpoint <cr>", { desc = "DAP Toggle Breakpoint" })
     vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "DAP Step Over" })
@@ -70,7 +60,7 @@ return {
       print "DAP session closed."
     end, { desc = "Close DAP Session and UI" })
 
-    -- Open/close dapui automatically
+    -- 5. Auto-open dapui when debug starts, auto-close when it ends
     dap.listeners.after.event_initialized["dapui_config"] = function()
       dapui.open()
     end
