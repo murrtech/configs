@@ -1,11 +1,3 @@
--- chadrc.lua
--- Place (or merge) this in your NVChad config at ~/.config/nvim/lua/custom/chadrc.lua
---
--- ENHANCEMENT:
---   - Adds a new clickable button (folder icon) that toggles NvimTree.
---   - This button is placed on the far right before the buffers, as requested.
---   - Pressing the icon calls :NvimTreeToggle.
-
 ---@type ChadrcConfig
 local M = {}
 
@@ -32,10 +24,12 @@ local lang_icons = {
 -- 3. CARGO.TOML PARSING FOR PROJECT NAME (unchanged from prior)
 --------------------------------------------------------------------------------
 local function find_nearest_cargo_toml(buf_path)
-  if buf_path == "" then
-    buf_path = vim.fn.expand "%:p"
+  -- If no buffer path, don't block
+  if not buf_path or buf_path == "" then
+    return nil
   end
 
+  -- Try using vim.fs first (preferred method)
   if vim.fs and vim.fs.find and vim.fs.dirname then
     local cargo_files = vim.fs.find("Cargo.toml", {
       upward = true,
@@ -45,8 +39,10 @@ local function find_nearest_cargo_toml(buf_path)
     if cargo_files and cargo_files[1] then
       return cargo_files[1]
     end
+    return nil -- Explicit nil return if not found
   end
 
+  -- Fallback method
   local sep = package.config:sub(1, 1)
   local function dirname(path)
     return path:match("(.*" .. sep .. ").-$") or path
@@ -66,48 +62,31 @@ local function find_nearest_cargo_toml(buf_path)
   return nil
 end
 
-local function parse_crate_name_from_cargo_toml(toml_path)
-  if not toml_path then
-    return "NoProject"
-  end
-
-  local file = io.open(toml_path, "r")
-  if not file then
-    return "NoProject"
-  end
-
-  local in_package_section = false
-  local crate_name = "NoProject"
-  for line in file:lines() do
-    local stripped = line:gsub("^%s*(.-)%s*$", "%1")
-    if stripped:match "^%[package%]" then
-      in_package_section = true
-    elseif in_package_section then
-      local name_match = stripped:match [[^name%s*=%s*"(.-)"]]
-      if name_match then
-        crate_name = name_match
-        break
-      end
-      if stripped:match "^%[.-%]" then
-        break
-      end
-    end
-  end
-  file:close()
-  return crate_name
-end
-
 local function update_project_name_for_buffer()
   if _G.debug_active then
     return
   end
 
+  -- Get buffer path safely
   local buf_path = vim.api.nvim_buf_get_name(0)
   if buf_path == "" then
     buf_path = vim.fn.expand "%:p"
   end
-  local cargo_toml = find_nearest_cargo_toml(buf_path)
-  local crate_name = parse_crate_name_from_cargo_toml(cargo_toml)
+
+  -- Safely try to find Cargo.toml
+  local ok, cargo_toml = pcall(find_nearest_cargo_toml, buf_path)
+  if not ok or not cargo_toml then
+    _G.project_name = "NoProject"
+    return
+  end
+
+  -- Safely parse crate name
+  local ok2, crate_name = pcall(parse_crate_name_from_cargo_toml, cargo_toml)
+  if not ok2 or not crate_name then
+    _G.project_name = "NoProject"
+    return
+  end
+
   _G.project_name = crate_name
 end
 

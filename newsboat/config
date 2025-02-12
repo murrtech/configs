@@ -1,21 +1,82 @@
-# Dark solarized color scheme for newsbeuter, based on
-# Ethan Schoonover's Solarized.
-#
-# In order to use this color scheme, you must first configure
-# your terminal emulator to use the Solarized palette.
-# See <http://ethanschoonover.com/solarized/> for more information.
+# ~/.newsboat/config
 
+# Browser
 browser "~/scripts/focus-firefox.sh %u"
 
-color background         default   default
-color listnormal         default   default
-color listnormal_unread  default   default
-color listfocus          black     yellow
-color listfocus_unread   black     yellow
-color info               default   black
-color article            default   default
+# Interface colors
+color background          color236  default
+color listnormal         color248  default
+color listnormal_unread  color81   default   bold
+color listfocus          color226  color237
+color listfocus_unread   color226  color237  bold
+color info               color141  color236  bold
+color article            color248  default
 
-# highlights
-highlight article "^(Title):.*$" blue default
-highlight article "https?://[^ ]+" red default
-highlight article "\\[image\\ [0-9]+\\]" green default
+# Highlights
+highlight article "^(Feed|Title|Author|Link|Date):.*$" color141 default bold
+highlight article "^(Title):.*$" color81 default bold
+highlight article "\\[[0-9]+\\]" color220 default bold
+highlight article "https?://[^ ]+" color32 default underline
+highlight article "\\[image\\ [0-9]+\\]" color112 default bold
+highlight article "\\[embedded flash: [0-9][0-9]*\\]" color112 default bold
+highlight feedlist "^─.*$" color238 color238 bold
+highlight feedlist "^.*\\(0/0\\)$" color238 default
+
+# Article formatting
+highlight article "^(Feed|Link|Date|Author):.*$" color248 default
+highlight article "^(Title):.*$" color81 default bold
+highlight article ":.*\\(link\\)$" color32 default
+highlight article ":.*\\(image\\)$" color112 default
+highlight article ":.*\\(embedded flash\\)$" color141 default
+
+# Display settings
+auto-reload yes
+reload-time 60
+reload-threads 4
+show-read-feeds no
+feed-sort-order unreadarticlecount-asc
+article-sort-order date-desc
+datetime-format "%Y-%m-%d"
+text-width 80
+
+# Keep more articles
+keep-articles-days 60
+max-items 100
+download-timeout 60
+download-retries 4
+
+# Navigation
+goto-next-feed no
+bookmark-autopilot yes
+mark-as-read-on-hover yes
+
+# Format strings (updated for newer versions)
+feedlist-format "%4i %n %11u %t"
+articlelist-format "%4i %f %D  %?T?|%-17T| ?%t"
+
+# Misc settings
+cleanup-on-quit yes
+confirm-exit no
+display-article-progress yes
+# Vim-like navigation keys
+bind-key j down
+bind-key k up
+bind-key l open
+bind-key h quit
+bind-key g home
+bind-key G end
+bind-key b pageup
+bind-key f pagedown
+bind-key u pageup
+bind-key d pagedown
+bind-key / goto-url           # Changed from searchforward
+bind-key n next-unread
+bind-key N prev-unread
+bind-key J next-feed
+bind-key K prev-feed
+
+# Article view navigation
+bind-key j down article
+bind-key k up article
+bind-key l open article
+bind-key h quit article

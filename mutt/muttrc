@@ -1,4 +1,3 @@
-# ~/.config/mutt/muttrc
 
 # Account Settings
 set folder = "imaps://murraybenjamin1@gmail.com@imap.gmail.com:993"
@@ -42,29 +41,20 @@ color markers red default
 # Index Format
 set date_format="%y-%m-%d %T"
 set index_format="%4C %Z %{%b %d} %-15.15L (%4l) %s"
-
 # Enhanced HTML/Alternative Handling
 set mailcap_path = "~/.config/mutt/mailcap"
 alternative_order text/plain text/enriched text/html
 auto_view text/html text/enriched image/*   # Let Mutt automatically handle these
 set implicit_autoview=yes
 
-# Better HTML Handling
-set allow_ansi=yes
-set markers=no
-set smart_wrap=yes
-set wrap=120
-
 # Advanced HTML settings
 ignore *
-unignore from: subject to cc date x-mailer user-agent
-unignore x-spam-status x-spam-report
-unignore message-id
+unignore from: subject to cc date user-agent
 hdr_order date from to cc subject
 
 # Force viewing HTML as text (with fallback order)
 alternative_order text/enriched text/plain text/html
-
+set display_filter="sed '/^\[--/d; /^|/d; /^[[:space:]]*|/d'"
 # Display Settings
 set pager_index_lines = 10
 set pager_context = 3
@@ -86,7 +76,7 @@ set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)
 
 # Sidebar Settings
 set sidebar_visible = yes
-set sidebar_width = 30
+set sidebar_width = 18
 set sidebar_format = "%B%*  %n"
 set sidebar_short_path = yes
 
@@ -103,3 +93,16 @@ set wait_key = no
 set sleep_time = 0
 ignore "Autoview using*"
 ignore "HTML*"
+# Additional display cleanup
+ignore "[--"
+ignore "|[--"
+ignore "Autoview using*"
+
+# Better HTML and link handling
+set wait_key = no
+set pipe_decode = yes
+set pipe_split = yes
+
+# URL viewing with urlscan
+macro index,pager \cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+macro attach,compose \cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs out of a message"

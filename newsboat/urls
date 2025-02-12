@@ -1,58 +1,51 @@
-# Computer Science Research
-https://export.arxiv.org/rss/cs.AI "research" "ai"          # AI research
-https://export.arxiv.org/rss/cs.LG "research" "ml"          # Machine Learning
-https://export.arxiv.org/rss/cs.SE "research" "software"    # Software Engineering
-https://export.arxiv.org/rss/cs.DC "research" "distributed" # Distributed Computing
-https://export.arxiv.org/rss/cs.DB "research" "databases"   # Databases
-https://export.arxiv.org/rss/cs.PL "research" "languages"   # Programming Languages
-https://export.arxiv.org/rss/cs.NE "research" "neural"      # Neural/Evolution
+# ~/.newsboat/urls
 
-# Academic Journals
-https://dl.acm.org/action/showFeed?type=etoc&feed=rss&jc=tosem "research" "software" # ACM Trans on Software Engineering
-https://ieeexplore.ieee.org/rss/TOC34.XML "research" "systems"                       # IEEE Trans on Software Engineering
-https://www.nature.com/nature.rss "research" "science"                               # Nature
-https://science.sciencemag.org/rss/express.xml "research" "science"                  # Science
-
-# Research Labs & Organizations
-https://research.fb.com/feed/ "research" "meta"
-https://blog.research.google/feeds/posts/default "research" "google"
-https://deepmind.com/blog/feed/basic/ "research" "ai"
-
-# Tech News & Blogs
-https://news.ycombinator.com/rss "tech" "news"               # Hacker News
-https://lobste.rs/rss "tech" "news"                         # Lobsters
-https://lwn.net/headlines/rss "tech" "linux"                # Linux Weekly News
-https://feeds.feedburner.com/TheHackersNews "tech" "security" # The Hacker News
+# Custom Mixed Feeds
+"query:⭐ All Latest:age < 7 and tags # \"news\"" "mixed"
+"query:💻 Dev & Tech:tags # \"dev\" or tags # \"tech\"" "mixed"
+"query:🤖 AI & ML:tags # \"ai\"" "mixed"
+"query:💬 Reddit:tags # \"reddit\"" "mixed"
+"query:🌍 World News:tags # \"world\"" "mixed"
+"query:💰 Finance:tags # \"finance\"" "mixed"
 
 # Programming & Development
-https://devblogs.microsoft.com/typescript/feed/ "dev" "typescript" # TypeScript Blog
 https://blog.rust-lang.org/feed.xml "dev" "rust"                  # Rust Blog
-https://blog.golang.org/feed.atom "dev" "golang"                  # Go Blog
 https://neovim.io/news.xml "dev" "neovim"                        # Neovim News
+https://devblogs.microsoft.com/typescript/feed/ "dev" "typescript" # TypeScript Blog
+https://blog.golang.org/feed.atom "dev" "golang"                  # Go Blog
 
-# Tech Companies
+# Tech News & Companies
+https://news.ycombinator.com/rss "tech" "news"               # Hacker News
+https://lobste.rs/rss "tech" "news"                         # Lobsters
+https://arstechnica.com/feed "tech" "news"                  # Ars Technica
 https://engineering.fb.com/feed/ "tech" "meta"              # Meta Engineering
 https://netflixtechblog.com/feed "tech" "netflix"          # Netflix Tech Blog
 https://blog.discord.com/feed "tech" "discord"              # Discord Blog
 https://aws.amazon.com/blogs/aws/feed/ "tech" "aws"        # AWS News
 
-# Security
-https://krebsonsecurity.com/feed/ "security" "news"         # Krebs on Security
-https://blog.malwarebytes.com/feed/ "security" "malware"    # Malwarebytes Blog
-https://nakedsecurity.sophos.com/feed "security" "news"     # Naked Security
-
-# Linux & Open Source
-https://itsfoss.com/feed/ "linux" "news"                    # It's FOSS
-https://www.phoronix.com/rss.php "linux" "news"            # Phoronix
-https://archlinux.org/feeds/news/ "linux" "arch"           # Arch Linux News
-
 # AI & ML News
 https://openai.com/blog/rss/ "ai" "news"                   # OpenAI Blog
 https://ai.googleblog.com/feeds/posts/default "ai" "google" # Google AI Blog
 https://blogs.nvidia.com/feed/ "ai" "nvidia"               # NVIDIA Blog
+https://deepmind.com/blog/feed/basic/ "research" "ai"      # DeepMind Blog
 
-# Reddit Feeds
-https://www.reddit.com/r/programming/.rss "reddit" "programming" # r/programming
+# World News & Current Events
+https://feeds.bbci.co.uk/news/world/rss.xml "world" "news"     # BBC World News
+https://rss.nytimes.com/services/xml/rss/nyt/World.xml "world" "news" # NYT World
+https://feeds.washingtonpost.com/rss/world "world" "news"      # WaPo World
+https://www.economist.com/the-world-this-week/rss.xml "world" "news" # Economist
+
+# Finance & Markets
+https://www.ft.com/world?format=rss "finance" "world"          # Financial Times
+https://feeds.marketwatch.com/marketwatch/topstories/ "finance" "markets" # MarketWatch
+https://www.cnbc.com/id/100003114/device/rss/rss.html "finance" "markets" # CNBC Markets
+https://www.bloomberg.com/feed/podcast/decrypted "finance" "tech"  # Bloomberg
+https://www.wsj.com/xml/rss/3_7031.xml "finance" "markets"    # WSJ Markets
+
+# Reddit Communities
 https://www.reddit.com/r/rust/.rss "reddit" "rust"             # r/rust
 https://www.reddit.com/r/neovim/.rss "reddit" "neovim"         # r/neovim
-https://www.reddit.com/r/archlinux/.rss "reddit" "arch"        # r/archlinux
+https://www.reddit.com/r/programming/.rss "reddit" "programming" # r/programming
+https://www.reddit.com/r/worldnews/.rss "reddit" "world"        # r/worldnews
+https://www.reddit.com/r/Economics/.rss "reddit" "finance"      # r/Economics
+https://www.reddit.com/r/StockMarket/.rss "reddit" "finance"    # r/StockMarket

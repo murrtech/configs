@@ -72,7 +72,7 @@ vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", {
 })
 
 -- 7) Example: standard servers (HTML, CSS) using NvChad defaults
-local servers = { "html", "cssls" }
+local servers = { "html", "cssls", "terraformls" }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = nvlsp.on_attach,
@@ -80,6 +80,13 @@ for _, lsp in ipairs(servers) do
     capabilities = nvlsp.capabilities,
   }
 end
+
+require("lspconfig").terraformls.setup {
+  root_dir = function(fname)
+    return require("lspconfig").util.root_pattern(".terraform", ".git", ".terraformrc", "terraform.rc")(fname)
+      or vim.fn.getcwd()
+  end,
+}
 
 -- 1) Save the original underline handler so we can wrap it.
 local original_underline = vim.diagnostic.handlers.underline
