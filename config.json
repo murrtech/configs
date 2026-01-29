@@ -1,0 +1,130 @@
+{
+  "archinstall-language": "English",
+  "audio_config": {
+    "audio": "pipewire"
+  },
+  "bootloader_config": {
+    "bootloader": "Systemd-boot",
+    "uki": false,
+    "removable": false
+  },
+  "debug": false,
+
+  "hostname": "archy",
+  "kernels": ["linux"],
+  "locale_config": {
+    "kb_layout": "us",
+    "sys_enc": "UTF-8",
+    "sys_lang": "en_US"
+  },
+  "mirror_config": {
+    "mirror_regions": {
+      "United States": ["https://mirrors.kernel.org/archlinux/$repo/os/$arch"]
+    }
+  },
+  "network_config": {
+    "type": "nm"
+  },
+  "no_pkg_lookups": false,
+  "ntp": true,
+  "offline": false,
+  "packages": [
+    "git",
+    "ranger",
+    "base-devel",
+    "firefox",
+    "neovim",
+    "docker",
+    "alacritty",
+    "tmux",
+    "fish",
+    "nodejs",
+    "npm",
+    "kubectl",
+    "ripgrep",
+    "github-cli",
+    "newsboat",
+    "task",
+    "calcurse",
+    "rofi",
+    "pavucontrol",
+    "jwt-ui",
+    "k9s",
+    "lazydocker",
+    "tectonic",
+    "gitui",
+    "exa",
+    "libreoffice-fresh",
+    "go",
+    "python-lsp-server",
+    "python-debugpy",
+    "python-pip",
+    "fd",
+    "picom",
+    "gdb",
+    "cmake",
+    "protobuf",
+    "libusb",
+    "webkit2gtk",
+    "gtk3",
+    "i3-wm",
+    "i3status",
+    "i3blocks",
+    "dmenu",
+    "xorg-server",
+    "xorg-xinit",
+    "rust",
+    "rustup",
+    "clipboard",
+    "wl-clipboard",
+    "xclip",
+    "polybar",
+    "radeontop",
+    "i3lock",
+    "trash-cli",
+    " swh-plugins",
+    "easyeffects",
+    "steam",
+    "vscode",
+    "terraform"
+  ],
+  "parallel downloads": 5,
+  "profile_config": {
+    "gfx_driver": "All open-source",
+    "greeter": "gdm",
+    "profile": {
+      "custom_settings": {
+        "GNOME": {},
+        "Hyprland": {
+          "seat_access": "polkit"
+        },
+        "i3-wm": {}
+      },
+      "details": ["GNOME", "Hyprland", "i3-wm"],
+      "main": "Desktop"
+    }
+  },
+  "!root-password": "1991",
+  "script": "guided",
+  "silent": false,
+  "swap": true,
+  "timezone": "America/Phoenix",
+  "!users": [
+    {
+      "username": "ben",
+      "!password": "1991",
+      "sudo": true
+    }
+  ],
+  "version": "2.8.6",
+  "custom_commands": [
+    "sed -i '/^#\\[multilib\\]/,/^#Include = \\/etc\\/pacman.d\\/mirrorlist/ s/^#//' /etc/pacman.conf",
+    "rustup default stable",
+    "systemctl enable docker.service",
+    "systemctl start docker.service",
+    "usermod -aG docker ben",
+    "chown -R ben:ben /home/ben",
+    "cargo install taskwarrior-tui",
+    "go install github.com/bcspragu/kagi/cmd/kagi@latest"
+  ]
+}
