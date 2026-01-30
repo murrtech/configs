@@ -17,11 +17,6 @@
     "sys_enc": "UTF-8",
     "sys_lang": "en_US"
   },
-  "mirror_config": {
-    "mirror_regions": {
-      "United States": ["https://mirrors.kernel.org/archlinux/$repo/os/$arch"]
-    }
-  },
   "network_config": {
     "type": "nm"
   },
