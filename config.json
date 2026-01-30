@@ -3,6 +3,7 @@
   "audio_config": {
     "audio": "pipewire"
   },
+"bluetooth_config":{"enabled":true},
   "bootloader_config": {
     "bootloader": "Systemd-boot",
     "uki": false,
