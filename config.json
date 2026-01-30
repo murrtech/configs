@@ -71,7 +71,6 @@
     "xorg-xinit",
     "rust",
     "rustup",
-    "clipboard",
     "xclip",
     "polybar",
     "radeontop",
